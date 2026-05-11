@@ -41,7 +41,7 @@ By the end of this lab, you will have a fully configured AWS account with secure
 
 **Estimated cost for this lab: $0.00**
 
-> **💰 Important note about costs:** When you create your AWS account, you will select the **Paid plan**. This does NOT mean you will be charged. It means you have access to all AWS services, and you only pay for what you use. All labs in this program use **Always Free** resources and include cleanup steps, so your bill should remain $0.00. You will also set up a cost budget alert in Lab 1B to monitor this.
+> **💰 Important note about costs:** When you create your AWS account, you will select the **Paid plan**. This does NOT mean you will be charged. It means you have access to all AWS services, and you only pay for what you use. All labs in this program use **Always Free** resources and include cleanup steps, so your bill should remain $0.00. You will also set up a cost budget alert in Lab 1B to monitor this. Should you select the **Free tier** on account creation, enabling IAM Identity Center will automatically change your account to the **Paid plan**.
 
 ---
 
