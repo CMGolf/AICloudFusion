@@ -103,9 +103,11 @@ aws s3 mb s3://<WEBSITE_BUCKET> --region us-east-1
 
 ### Step 3: Create the Lambda IAM Role
 
-Both Lambda functions need a role with S3 access and logging permissions.
+Both Lambda functions need a role that gives them permission to access S3 and write logs. You will create this role now.
 
-**Create `lambda-trust-policy.json`:**
+**Step 3a: Create the trust policy file**
+
+Open your text editor and create a **new file**. 📋 Copy and paste this into the file:
 
 ```json
 {
@@ -122,29 +124,57 @@ Both Lambda functions need a role with S3 access and logging permissions.
 }
 ```
 
-📋 Run these commands:
+**Save the file as `lambda-trust-policy.json`** in the same folder where you are running your terminal commands.
+
+> **What is this file?** It tells AWS "Lambda functions are allowed to use this role." Without it, Lambda can't assume the role's permissions.
+
+---
+
+**Step 3b: Create the role and attach permissions**
+
+📋 Copy and paste these three commands into your terminal, **one at a time**, pressing Enter after each:
 
 ```
 aws iam create-role --role-name workshop-pipeline-role --assume-role-policy-document file://lambda-trust-policy.json
 ```
 
+> **What does this do?** Creates a new IAM role called `workshop-pipeline-role`.
+
 ```
 aws iam attach-role-policy --role-name workshop-pipeline-role --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
 ```
+
+> **What does this do?** Gives the role permission to read from and write to any S3 bucket.
 
 ```
 aws iam attach-role-policy --role-name workshop-pipeline-role --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 ```
 
-**Wait 10 seconds** for IAM to propagate.
+> **What does this do?** Gives the role permission to write logs to CloudWatch (so you can see what happened when the function runs).
+
+**⏳ Wait 10 seconds** before continuing to the next step. IAM changes take a moment to propagate across AWS.
 
 ---
 
 ### Step 4: Create the Presign Lambda Function
 
-This function generates a temporary upload URL that the web page uses to upload files directly to S3.
+Now you will create the first Lambda function. This function's job is simple: when the web page asks for an upload link, this function generates a temporary URL that allows the upload.
 
-**Create `presign_function.py`:**
+**You do NOT need to know Python to complete this step.** You are just copying pre-written code into a file. The code is provided for you — just follow the steps exactly.
+
+---
+
+**Step 4a: Open your text editor and create a new file**
+
+Open your text editor (VS Code, Notepad, or any editor). Create a **new, empty file**.
+
+> **💡 Important:** Make sure you are saving files in the **same folder** where you have been running your terminal commands. If you're not sure which folder that is, type `pwd` in your terminal (macOS/Linux) or check the path shown in your PowerShell prompt (e.g., `C:\Users\YourName`).
+
+---
+
+**Step 4b: Copy and paste the code below into the file**
+
+📋 Copy this **entire block** of code and paste it into your new file. Do not change anything — copy it exactly as shown:
 
 ```python
 import json
@@ -175,13 +205,43 @@ def lambda_handler(event, context):
     }
 ```
 
-> **What does this do?** When the web page calls this function with a filename, it generates a presigned URL that allows uploading that file to the input bucket. The URL expires after 5 minutes.
+---
 
-> **Important:** Do NOT add CORS headers in the code — the Function URL configuration handles CORS automatically. Adding them in both places causes a "duplicate header" error.
+**Step 4c: Save the file as `presign_function.py`**
 
-**Zip and deploy:**
+Save the file with the **exact name** `presign_function.py`. The name matters — Lambda uses it to find the code.
+
+> **⚠️ Common mistakes:**
+> - Make sure the file extension is `.py` (not `.py.txt` or `.txt`)
+> - Make sure there are no extra spaces or blank lines at the beginning of the file
+> - If using Notepad on Windows, change "Save as type" to "All Files" before saving, otherwise it may add `.txt` to the end
+
+---
+
+**Step 4d: What does this code do? (optional reading)**
+
+You don't need to understand the code to complete this lab, but here's what each part does if you're curious:
+
+| Line(s) | What It Does |
+|---------|-------------|
+| `import json, boto3, os` | Loads libraries that the code needs (JSON handling, AWS SDK, environment variables) |
+| `s3_client = boto3.client('s3')` | Creates a connection to the S3 service |
+| `def lambda_handler(event, context):` | This is the function that Lambda calls when triggered. Think of it as the "main" function. |
+| `params = event.get(...)` | Gets the filename from the web page's request |
+| `input_bucket = os.environ['INPUT_BUCKET']` | Reads the input bucket name from a configuration variable (you'll set this when deploying) |
+| `s3_client.generate_presigned_url(...)` | Generates a temporary URL that allows uploading one file to S3 |
+| `ExpiresIn=300` | The URL is valid for 300 seconds (5 minutes) |
+| `return {...}` | Sends the URL back to the web page |
+
+---
+
+**Step 4e: Package the code into a zip file**
+
+Lambda requires code to be uploaded as a `.zip` file. You will zip the file you just created.
 
 **macOS / Linux:**
+
+📋 Copy and paste this command into your terminal:
 
 ```bash
 zip presign.zip presign_function.py
@@ -189,11 +249,23 @@ zip presign.zip presign_function.py
 
 **Windows (PowerShell):**
 
+📋 Copy and paste this command into your terminal:
+
 ```powershell
 Compress-Archive -Path presign_function.py -DestinationPath presign.zip -Force
 ```
 
-📋 Deploy, **replacing `<YOUR_ACCOUNT_ID>` and `<INPUT_BUCKET>`**:
+> **What does this do?** Creates a file called `presign.zip` that contains your `presign_function.py`. This is the package you will upload to Lambda.
+
+**✅ You should now have two files in your folder:** `presign_function.py` and `presign.zip`
+
+---
+
+**Step 4f: Deploy the function to AWS Lambda**
+
+Now you will upload the zip file to Lambda and create the function.
+
+📋 Copy and paste this command, **replacing `<YOUR_ACCOUNT_ID>` and `<INPUT_BUCKET>`** with your actual values:
 
 **Windows (PowerShell):**
 
@@ -214,13 +286,40 @@ aws lambda create-function \
     --region us-east-1
 ```
 
+> **What does each part mean?**
+> - `--function-name workshop-presign` — names the function so you can find it later
+> - `--runtime python3.12` — tells Lambda to use Python to run the code
+> - `--role "arn:aws:iam::..."` — which permissions the function has (the role you created in Step 3)
+> - `--handler presign_function.lambda_handler` — tells Lambda "look in the file `presign_function.py` and call the function named `lambda_handler`"
+> - `--zip-file fileb://presign.zip` — the code package to upload (`fileb://` means "binary file from my computer")
+> - `--environment "Variables={INPUT_BUCKET=...}"` — passes your input bucket name to the function as a configuration variable (this is how the code knows which bucket to generate URLs for)
+
+**✅ You should see** a JSON response with details about the function, including `"State": "Active"`.
+
+**✅ Checkpoint — In the AWS Console:**
+1. Search for **Lambda** → click it
+2. Make sure you're in the **us-east-1** region
+3. You should see **workshop-presign** in the functions list
+
 ---
 
 ### Step 5: Create the Processing Lambda Function
 
-This function triggers when a file is uploaded to the input bucket, processes it, and saves the result to the output bucket.
+Now you will create the second Lambda function. This one triggers automatically when a file is uploaded to the input bucket. It reads the file, converts the text to uppercase, counts the words, and saves the result to the output bucket.
 
-**Create `process_function.py`:**
+Again — **you do NOT need to know Python.** Just copy the code exactly as shown.
+
+---
+
+**Step 5a: Open your text editor and create a new file**
+
+Create another **new, empty file** in your text editor. This will be a separate file from the one you created in Step 4.
+
+---
+
+**Step 5b: Copy and paste the code below into the file**
+
+📋 Copy this **entire block** of code and paste it into your new file:
 
 ```python
 import json
@@ -261,9 +360,39 @@ def lambda_handler(event, context):
     return {'statusCode': 200, 'body': json.dumps(f'Processed {source_key}')}
 ```
 
-**Zip and deploy:**
+---
+
+**Step 5c: Save the file as `process_function.py`**
+
+Save the file with the **exact name** `process_function.py` in the **same folder** as your other files.
+
+> **⚠️ Same warnings as before:** Make sure the extension is `.py`, not `.py.txt`. Make sure there are no extra spaces at the beginning.
+
+---
+
+**Step 5d: What does this code do? (optional reading)**
+
+| Line(s) | What It Does |
+|---------|-------------|
+| `source_bucket = event['Records'][0]...` | When S3 triggers this function, it sends information about which file was uploaded. This line reads the bucket name and filename. |
+| `if not source_key.endswith('.txt'):` | Only process `.txt` files — skip everything else |
+| `s3_client.get_object(...)` | Downloads the uploaded file from S3 |
+| `original_text.upper()` | Converts all text to UPPERCASE |
+| `len(original_text.split())` | Counts the number of words |
+| `output_content = ...` | Builds the processed output with a header showing the filename and word count |
+| `output_bucket = os.environ['OUTPUT_BUCKET']` | Reads the output bucket name from configuration |
+| `s3_client.put_object(...)` | Uploads the processed result to the output bucket |
+| `output_key = f"processed-{source_key}"` | Names the output file `processed-` plus the original filename |
+
+**In plain English:** "When a .txt file is uploaded to the input bucket, download it, convert it to uppercase, count the words, add a header, and save the result to the output bucket."
+
+---
+
+**Step 5e: Package the code into a zip file**
 
 **macOS / Linux:**
+
+📋 Copy and paste:
 
 ```bash
 zip process.zip process_function.py
@@ -271,17 +400,49 @@ zip process.zip process_function.py
 
 **Windows (PowerShell):**
 
+📋 Copy and paste:
+
 ```powershell
 Compress-Archive -Path process_function.py -DestinationPath process.zip -Force
 ```
 
-📋 Deploy, **replacing `<YOUR_ACCOUNT_ID>` and `<OUTPUT_BUCKET>`**:
+**✅ You should now have these files in your folder:** `presign_function.py`, `presign.zip`, `process_function.py`, `process.zip`
+
+---
+
+**Step 5f: Deploy the function to AWS Lambda**
+
+📋 Copy and paste, **replacing `<YOUR_ACCOUNT_ID>` and `<OUTPUT_BUCKET>`**:
 
 **Windows (PowerShell):**
 
 ```powershell
 aws lambda create-function --function-name workshop-processor --runtime python3.12 --role "arn:aws:iam::<YOUR_ACCOUNT_ID>:role/workshop-pipeline-role" --handler process_function.lambda_handler --zip-file fileb://process.zip --environment "Variables={OUTPUT_BUCKET=<OUTPUT_BUCKET>}" --region us-east-1
 ```
+
+**macOS / Linux:**
+
+```bash
+aws lambda create-function \
+    --function-name workshop-processor \
+    --runtime python3.12 \
+    --role "arn:aws:iam::<YOUR_ACCOUNT_ID>:role/workshop-pipeline-role" \
+    --handler process_function.lambda_handler \
+    --zip-file fileb://process.zip \
+    --environment "Variables={OUTPUT_BUCKET=<OUTPUT_BUCKET>}" \
+    --region us-east-1
+```
+
+> **What's different from the presign function?**
+> - Different function name (`workshop-processor`)
+> - Different handler (`process_function.lambda_handler` — points to the `process_function.py` file)
+> - Different environment variable (`OUTPUT_BUCKET` instead of `INPUT_BUCKET`)
+
+**✅ You should see** a JSON response with `"State": "Active"`.
+
+**✅ Checkpoint — In the AWS Console:**
+1. Go to **Lambda** → **Functions**
+2. You should now see **two functions**: `workshop-presign` and `workshop-processor`
 
 ---
 
