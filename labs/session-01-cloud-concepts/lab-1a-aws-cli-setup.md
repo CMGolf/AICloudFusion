@@ -174,6 +174,7 @@ Now that you have an AWS account, you will set up **IAM Identity Center** — th
 2. In the **search bar at the top** of the page, type **IAM Identity Center**
 3. Click **IAM Identity Center** from the search results
 4. You will see a page that says **Enable IAM Identity Center**
+5. At the top right section of the page next to your username, select **N. Virginia us-east-1** as your region.
 
 ---
 
