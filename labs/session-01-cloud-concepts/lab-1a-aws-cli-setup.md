@@ -139,7 +139,7 @@ You will see two options: **Free** and **Paid**.
 
 **Select the Paid plan.**
 
-> **💡 Why Paid and not Free?** The Free plan limits which services you can use and does not allow you to enable IAM Identity Center (the secure login system we need). The Paid plan gives you access to all services, and you only pay for what you use. Since all our labs use Always Free resources and include cleanup steps, your bill will be $0.00. You also receive **$200 in credits** when you sign up, which covers any accidental usage.
+> **💡 Why Paid and not Free?** The Free plan limits which services you can use and does not allow you to enable IAM Identity Center (the secure login system we need). The Paid plan gives you access to all services, and you only pay for what you use. Since all our labs use Always Free resources and include cleanup steps, your bill will be $0.00. You also receive **$100 in credits** when you sign up, which covers any accidental usage.
 
 ---
 
