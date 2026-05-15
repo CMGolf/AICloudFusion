@@ -31,7 +31,7 @@ In this lab, you will launch a **virtual server** on AWS using Amazon EC2 (Elast
 
 | Service | What It Is | Free Tier Limit |
 |---------|-----------|----------------|
-| Amazon EC2 (t2.micro) | Virtual server | 750 hours/month free for 12 months |
+| Amazon EC2 (eg. t2.micro) | Virtual server | 750 hours/month free for 12 months |
 | AWS Systems Manager (Session Manager) | Remote connection to instances | Always Free |
 | IAM | Identity and access management | Always Free |
 
