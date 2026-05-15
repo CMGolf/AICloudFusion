@@ -13,7 +13,7 @@ In this lab, you will launch a **virtual server** on AWS using Amazon EC2 (Elast
 
 **What you will do:**
 - Create an IAM role so the server can communicate with AWS services
-- Launch a t2.micro EC2 instance (free tier eligible)
+- Launch the smallest free tier EC2 instance available. During lab launch that would have been t2.micro (free tier eligible)
 - Connect to it using Session Manager (a browser-based terminal)
 - Explore the instance (check OS, memory, disk)
 - Terminate the instance and verify it's gone
