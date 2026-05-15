@@ -43,7 +43,7 @@ In this lab, you will launch a **virtual server** on AWS using Amazon EC2 (Elast
 
 **Amazon EC2 (Elastic Compute Cloud)** is a service that lets you rent virtual servers in the cloud. Each server is called an **instance**. You choose the size (how much CPU and memory), the operating system, and the region. It's like renting a computer that lives in an AWS data center — you can connect to it, install software, run applications, and delete it when you're done.
 
-**Instance type** describes the size of the server. `t2.micro` is the smallest — 1 CPU, 1 GB memory. It's free tier eligible and perfect for learning.
+**Instance type** describes the size of the server. `t2.micro` is the smallest currently — 1 CPU, 1 GB memory. It's free tier eligible and perfect for learning.
 
 **AMI (Amazon Machine Image)** is the operating system template. We will use **Amazon Linux 2023** — a Linux distribution made by AWS that comes with useful tools pre-installed.
 
