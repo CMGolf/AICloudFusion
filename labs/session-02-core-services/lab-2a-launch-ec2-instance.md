@@ -29,9 +29,9 @@ In this lab, you will launch a **virtual server** on AWS using Amazon EC2 (Elast
 
 ## Cost Notice
 
-| Service | What It Is | Free Tier Limit |
+| Service | What It Is | Credits Needed |
 |---------|-----------|----------------|
-| Amazon EC2 (eg. t3.nano) | Virtual server | $0.0052/hr **credits buffer needed** |
+| Amazon EC2 (eg. t3.nano) | Virtual server | $0.0052/hr |
 | AWS Systems Manager (Session Manager) | Remote connection to instances | Always Free |
 | IAM | Identity and access management | Always Free |
 
