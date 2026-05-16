@@ -160,6 +160,8 @@ You will see two options: **Free** and **Paid**.
 
 **✅ Checkpoint:** Once activated, sign in to the [AWS Management Console](https://console.aws.amazon.com/) using your **root user email** and **password**. You should see the AWS Console homepage.
 
+**In the search bar at the top left, type Billing and Cost Management and select the service. On the left hand menu select Credits and be sure that you have the $100 USD credits available. Do not proceed if you are seeing 0.00 across the screen. Review troubleshooting errors at the bottom of this page first.**
+
 ---
 
 ## Part 2: Enable IAM Identity Center
@@ -552,6 +554,7 @@ Keep these values somewhere safe — you will need them for every future lab:
 | Browser does not open during `aws configure sso` | Browser launch failed | Look in your terminal for a URL — copy it and paste it into your browser manually. |
 | `Error when retrieving token from sso: Token has expired` | Your SSO session expired (normal) | Run `aws sso login --profile <YOUR_PROFILE_NAME>` again. |
 | Wrong account number in `get-caller-identity` output | You may have selected the wrong account during SSO setup | Run `aws configure sso` again and select the correct account. |
+|No credits available| AWS has the credit card on file previously | 1) Log back into original account. If closed, contact support to reopen which can take 24hrs or 2) Create new account with a different card |
 
 ---
 
