@@ -30,6 +30,7 @@ Work through the labs in order (A → B → C). Each lab includes:
 |---------|-------|------|
 | 1 | Cloud Concepts & AWS Global Infrastructure | [Lab 1A: AWS Account & CLI Setup](session-01-cloud-concepts/lab-1a-aws-cli-setup.md) · [Lab 1B: Cost Budget & SNS Alert](session-01-cloud-concepts/lab-1b-cost-budget-sns-alert.md) · [Lab 1C: S3 Static Website](session-01-cloud-concepts/lab-1c-s3-static-website.md) |
 | 2 | Core AWS Services | [Lab 2A: Launch EC2 Instance](session-02-core-services/lab-2a-launch-ec2-instance.md) · [Lab 2B: EC2 + S3 with IAM Role](session-02-core-services/lab-2b-ec2-s3-iam-role.md) · [Lab 2C: Serverless File Pipeline](session-02-core-services/lab-2c-serverless-file-pipeline.md) |
+| 3 | Cloud Security Fundamentals | [Lab 3A: IAM Least Privilege](session-03-cloud-security/lab-3a-iam-least-privilege.md) · [Lab 3B: Groups, Custom Policy & MFA](session-03-cloud-security/lab-3b-groups-custom-policy-mfa.md) · [Lab 3C: Roles & CloudTrail Audit](session-03-cloud-security/lab-3c-roles-cloudtrail-audit.md) |
 
 *More sessions coming soon.*
 
