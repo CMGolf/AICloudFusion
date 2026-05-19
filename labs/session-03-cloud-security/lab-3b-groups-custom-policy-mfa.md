@@ -37,10 +37,10 @@ By the end of this lab, you will understand how groups simplify permission manag
 | Service | What It Is | Cost |
 |---------|-----------|------|
 | IAM | Identity and Access Management | Always Free |
-| Amazon S3 | Cloud storage for files | Free within 5 GB / 2,000 PUT / 20,000 GET per month (12-month free tier) |
+| Amazon S3 | Cloud storage for files | 0.023 per GB |
 | MFA | Multi-Factor Authentication | Always Free |
 
-**Estimated cost for this lab: $0.00**
+**Estimated cost for this lab: $0.023**
 
 ---
 
