@@ -435,7 +435,7 @@ aws budgets delete-budget --account-id <YOUR_ACCOUNT_ID> --budget-name "workshop
 
 **✅ No output means success.**
 
-### Step 2: Delete the SNS Topic
+### Step 2: Delete the SNS Topic and Subscription
 
 Deleting the topic automatically removes all subscriptions attached to it.
 
@@ -446,6 +446,8 @@ aws sns delete-topic --topic-arn <YOUR_TOPIC_ARN> --region us-east-1
 ```
 
 **✅ No output means success.**
+
+Go to the AWS Console and manually remove the orphaned subscripton.
 
 ### Step 3: Verify Everything Is Gone
 
@@ -482,6 +484,9 @@ rm -rf ~/Desktop/workshop-lab-1b
 ```powershell
 Remove-Item -Recurse -Force ~\Desktop\workshop-lab-1b
 ```
+
+### Step 5: Time to Redo!
+Now that you’ve successfully cleaned up this lab, it’s strongly recommended to **set up a budget again** for the duration of the project. Associating a budget with any project is considered best practice, and in this case the cost of keeping this budget, SNS topic and subscription active over three months should remain at zero or very close to it. Whereas, the **safeguard it provides in alerting you** in advance if any resources consuming credits are left behind, is invaluable.
 
 ---
 
