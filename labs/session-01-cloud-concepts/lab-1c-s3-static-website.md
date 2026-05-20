@@ -34,7 +34,7 @@ This is one of the most common tasks for cloud engineers — hosting static cont
 |---------|-----------|----------------|
 | Amazon S3 | Cloud storage for files | $0.005 per GB‑month, $0.0004 per 1,000 PUT/GET requests |
 
-**Students will typically consume between $0.00 and $0.05 of their AWS credits over 3 months of S3 usage.  Most will use less than $0.01 of the $100 USD of AWS credits, effectively zero from students' actual pockets**
+**Estimated cost of this lab will be $0.00 since both the storage and put/get requests will be less than 0.01 cents by the end of the billing cycle.**
 
 
 ---
