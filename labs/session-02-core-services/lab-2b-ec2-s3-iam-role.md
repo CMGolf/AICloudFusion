@@ -37,7 +37,7 @@ This is a real-world pattern — applications running on EC2 frequently need to 
 | AWS Systems Manager | Remote connection | Always Free |
 | IAM | Access management | Always Free |
 
-**Estimated cost for this lab if you run your ec2 instance for a WHOLE month and never use more than 1GB of storage: $3.77**
+**Estimated cost for this lab if you run your ec2 instance for a WHOLE month and never use more than 1GB of storage: $3.79**
 
 ---
 
