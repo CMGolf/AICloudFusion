@@ -41,7 +41,17 @@ By the end of this lab, you will have a fully configured AWS account with secure
 
 **Estimated cost for this lab: $0.00**
 
-> **💰 Important note about costs:** When you create your AWS account, you will select the **Paid plan**. This does NOT mean you will be charged. It means you have access to all AWS services, and you only pay for what you use. All labs in this program use **Always Free** resources and include cleanup steps, so your bill should remain $0.00. You will also set up a cost budget alert in Lab 1B to monitor this.  **Note** To use IAM Identity Center will require creating an AWS Organization which will automatically change a plan from Free to Paid.
+> **💰 Important note about costs:**
+
+When you create your AWS account, you will select the **Paid plan**. This does **not** mean you will be charged immediately—it simply gives you access to all AWS services, and you only pay for what you use.  
+
+Previously, all labs in this program were designed to use **Always Free resources** with cleanup steps to keep your bill at $0.00. You will also set up a **cost budget alert** in Lab 1B to monitor usage and as an additional safeguard to catch resources that weren't cleaned up. 
+
+⚠️ **Update:** To use **IAM Identity Center**, you must enable **AWS Organizations**. Activating AWS Organizations automatically expires the free credits provided by AWS.  
+
+While there is a workaround to remain on the free tier by using personal IAM user settings, this approach is rarely used in real-world company environments, is less secure, and does not align with the project’s goal of providing practical, hands‑on experience.  
+
+The estimated costs of the labs are relatively small compared to the value of the skills you’ll gain (Session 2 for example will cost you 3 USD that month if you forget to clean up your EC2 isntance and it is left running for the whole month), but it is important to be aware of them. Each lab write‑up will now include the **associated monthly cost estimates** so you can plan accordingly.
 
 ---
 
