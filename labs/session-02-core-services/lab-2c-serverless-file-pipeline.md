@@ -37,7 +37,7 @@ This is a real-world architecture pattern — serverless web applications that p
 
 | Service | What It Is | Credits Needed |
 |---------|-----------|----------------|
-| AWS Lambda | Serverless compute | 1 million requests/month Always Free |
+| AWS Lambda | Serverless compute | 1 million requests/month Free |
 | Amazon S3 | Cloud storage + website hosting | 0.023 per GB |
 | Lambda Function URLs | Public HTTP endpoint for Lambda | Included with Lambda free tier |
 | IAM | Access management | Always Free |
