@@ -492,7 +492,7 @@ aws lambda create-function \
 
 ---
 
-### Step 7: Create a Function URL for the Presign Lambda
+### Step 7: Create a Function URL for the Presign Lambda and InvokeFunction Policy
 
 This gives the presign function a public URL that the web page can call.
 
@@ -516,6 +516,11 @@ aws lambda create-function-url-config --function-name workshop-presign --auth-ty
 
 ```
 aws lambda add-permission --function-name workshop-presign --statement-id FunctionURLAllowPublicAccess --action lambda:InvokeFunctionUrl --principal "*" --function-url-auth-type NONE --region us-east-1
+```
+**lambda:InvokeFunction is the general "run this function" permission — Lambda Function URLs require both: InvokeFunctionUrl to authorize the URL endpoint itself, and InvokeFunction to actually execute the function behind it. Without both granted to '*', public access is denied.**
+
+```
+aws lambda add-permission --function-name workshop-presign --statement-id AllowPublicInvoke --action lambda:InvokeFunction --principal "*" --region us-east-1
 ```
 
 > **⏳ Wait 1–2 minutes** for the permission to propagate before testing.
