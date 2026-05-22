@@ -492,7 +492,7 @@ aws lambda create-function \
 
 ---
 
-### Step 7: Create a Function URL for the Presign Lambda and InvokeFunction Policy
+### Step 7: Create a Function URL for the Presign Lambda and InvokeFunction Permission
 
 This gives the presign function a public URL that the web page can call.
 
