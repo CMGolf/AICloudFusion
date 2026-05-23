@@ -71,7 +71,23 @@ This is a real-world architecture pattern — serverless web applications that p
 
 ## Lab Steps
 
-### Step 1: Connect your CLI to AWS via SSO
+### Step 1: Set Your AWS Profile
+
+**Windows (PowerShell):**
+
+```powershell
+$env:AWS_PROFILE="<YOUR_PROFILE_NAME>"
+```
+
+**macOS / Linux:**
+
+```bash
+export AWS_PROFILE="<YOUR_PROFILE_NAME>"
+```
+
+We do this to setup the AWS profile name so you don't have to call --profile <YOUR_PROFILE_NAME> after every aws command listed below. Else you would get credentials error.
+
+### Step 1b: Connect your CLI to AWS via SSO
 
 Check if your session is still active:
 
@@ -80,13 +96,13 @@ Check if your session is still active:
 **Windows (PowerShell):**
 
 ```powershell
-aws sts get-caller-identity --profile <YOUR_PROFILE_NAME>
+aws sts get-caller-identity
 ```
 
 **macOS / Linux:**
 
 ```bash
-aws sts get-caller-identity --profile <YOUR_PROFILE_NAME>
+aws sts get-caller-identity
 ```
 If you are starting a new terminal instance or the session has expired you will get this error:
 
@@ -98,7 +114,7 @@ Connect to AWS via SSO:
 **Windows (PowerShell) & Linux/macOS:**
 
 ```
-aws sso login --profile <YOUR_PROFILE_NAME>
+aws sso login
 ```
 A new browser should open either authorizating the access (*if you are already logged into the console*) ,or requesting you to log into the console before authorizing the connection.
 
