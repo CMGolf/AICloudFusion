@@ -95,6 +95,14 @@ $env:AWS_PROFILE="<YOUR_PROFILE_NAME>"
 export AWS_PROFILE="<YOUR_PROFILE_NAME>"
 ```
 
+**Re-establish your SSO login**
+
+```
+aws sso login --profile <YOUR_PROFILE_NAME>
+```
+This will open up browser for you to authenticate account.
+
+
 **Verify it works and get your Account ID.** 📋 Copy and paste:
 
 ```
