@@ -85,6 +85,7 @@ aws sts get-caller-identity
 ```
 
 **✅ You should see** your account ID and role. If you get an error about an expired token, run `aws sso login --profile <YOUR_PROFILE_NAME>`
+
 ---
 
 ### Step 2: Create Your Project Folder
