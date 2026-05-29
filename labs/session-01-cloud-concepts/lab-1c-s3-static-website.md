@@ -32,9 +32,9 @@ This is one of the most common tasks for cloud engineers — hosting static cont
 
 | Service | What It Is | Cost |
 |---------|-----------|----------------|
-| Amazon S3 | Cloud storage for files | $0.005 per GB‑month, $0.0004 per 1,000 PUT/GET requests |
+| Amazon S3 | Cloud storage for files | $0.023 per GB/month, $0.0005 per 1,000 PUT/GET requests |
 
-**Estimated cost of this lab will be $0.00 since both the storage and put/get requests will be less than 0.01 cents by the end of the billing cycle.**
+**Estimated cost of this lab will be $0.02**
 
 
 ---
