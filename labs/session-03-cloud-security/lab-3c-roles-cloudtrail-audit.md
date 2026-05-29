@@ -184,7 +184,7 @@ CloudTrail needs permission to write log files to your bucket. You must add a bu
 
 **Step 4a:** Open your text editor and create a **new, empty file**.
 
-**Step 4b:** 📋 Copy and paste this entire block into the file, **replacing `<YOUR_BUCKET_NAME>`** (3 places) and **`<YOUR_ACCOUNT_ID>`** (1 place):
+**Step 4b:** 📋 Copy and paste this entire block into the file, **replacing `<YOUR_BUCKET_NAME>`** (2 places) and **`<YOUR_ACCOUNT_ID>`** (1 place):
 
 ```json
 {
