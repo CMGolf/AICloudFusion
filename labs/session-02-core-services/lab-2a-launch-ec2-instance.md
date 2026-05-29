@@ -53,6 +53,8 @@ If you run the EC2 instance for _a month in error_ you can expect $3.80, which i
 
 **IAM Instance Profile** is a way to give your EC2 instance permissions to use other AWS services. Instead of putting access keys on the server (insecure), you attach a role that grants specific permissions.
 
+**Amazon VPC (Virtual Private Cloud)** is your isolated network inside AWS where your EC2 instances and other resources live. It controls IP ranges, subnets, routing, and security. Every AWS account includes a default VPC in each region. If you launch an EC2 instance without choosing a VPC, AWS automatically places it into that region’s default VPC.
+
 ---
 
 ## ⚠️ Placeholders in This Lab
