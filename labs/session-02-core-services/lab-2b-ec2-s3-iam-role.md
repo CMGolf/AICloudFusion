@@ -32,7 +32,7 @@ This is a real-world pattern — applications running on EC2 frequently need to 
 
 | Service | What It Is | Credits Needed |
 |---------|-----------|----------------|
-| Amazon EC2 (t3.nano) | Virtual server | 0.0052 per hour |
+| Amazon EC2 (t3a.nano) | Virtual server | 0.0047 per hour |
 | Amazon S3 | Cloud storage | 0.023 per GB |
 | AWS Systems Manager | Remote connection | Always Free |
 | IAM | Access management | Always Free |
@@ -223,7 +223,7 @@ aws iam add-role-to-instance-profile --instance-profile-name workshop-ec2-s3-pro
 **Windows (PowerShell):**
 
 ```powershell
-aws ec2 run-instances --image-id <AMI_ID> --instance-type t3.nano --iam-instance-profile Name=workshop-ec2-s3-profile --region us-east-1 --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=workshop-s3-access}]" --query "Instances[0].InstanceId" --output text
+aws ec2 run-instances --image-id <AMI_ID> --instance-type t3a.nano --iam-instance-profile Name=workshop-ec2-s3-profile --region us-east-1 --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=workshop-s3-access}]" --query "Instances[0].InstanceId" --output text
 ```
 
 **macOS / Linux:**
@@ -231,7 +231,7 @@ aws ec2 run-instances --image-id <AMI_ID> --instance-type t3.nano --iam-instance
 ```bash
 aws ec2 run-instances \
     --image-id <AMI_ID> \
-    --instance-type t3.nano \
+    --instance-type t3a.nano \
     --iam-instance-profile Name=workshop-ec2-s3-profile \
     --region us-east-1 \
     --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=workshop-s3-access}]' \
