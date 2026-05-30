@@ -452,7 +452,7 @@ Let's see the event history in the AWS Console:
 2. Search for **CloudTrail** in the top search bar and click it
 3. Click **Event history** in the left sidebar
 4. You should see a list of recent events in your account
-5. Use the filter dropdown to search for:
+5. Use the filter dropdown set to Event Name and search for:
    - **Event name:** `CreateUser` — find when the suspicious user was created
    - **Event name:** `DeleteUser` — find when it was deleted
 6. Click on any event to see the full JSON details, including the source IP address and request parameters
