@@ -35,7 +35,7 @@ By the end of this lab, you will understand how real organizations implement rol
 
 | Service | What It Is | Cost |
 |---------|-----------|------|
-| CloudTrail | Audit logging for AWS actions | First trail is Always Free |
+| CloudTrail | Audit logging for AWS actions | First active trail is Always Free |
 | IAM | Identity and Access Management | Always Free |
 | Amazon S3 | Storage for CloudTrail logs | 0.023 per GB |
 
