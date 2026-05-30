@@ -39,6 +39,12 @@ By the end of this lab, you will understand how CloudTrail provides an immutable
 
 **Estimated cost for this lab: $0.00** - as you would have already created buckets from previous labs. Make sure your active trail from lab 3c has been deleted.
 
+This command will check for existing trails:
+```
+aws cloudtrail describe-trails --query "trailList[].{Name:Name,Status:Status}" --region us-east-1
+```
+If it returns `[]` then there are none active.
+
 ---
 
 ## Concepts
