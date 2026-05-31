@@ -380,12 +380,12 @@ Now connect the rule to your SNS topic — when the rule matches a finding, it p
 📋 Copy and paste, **replacing `<TOPIC_ARN>`**:
 
 ```
-aws events put-targets --rule workshop-guardduty-alert --targets "Id"="sns-target","Arn"="<TOPIC_ARN>" --region us-east-1
+aws events put-targets --rule workshop-guardduty-alert --targets '[{\"Id\":\"sns-target\",\"Arn\":\"<TOPIC_ARN>\"}]' --region us-east-1
 ```
 
 > **🔄 Example:**
 > ```
-> aws events put-targets --rule workshop-guardduty-alert --targets "Id"="sns-target","Arn"="arn:aws:sns:us-east-1:123456789012:workshop-security-alerts" --region us-east-1
+> aws events put-targets --rule workshop-guardduty-alert --targets '[{\"Id\":\"sns-target\",\"Arn\":\"arn:aws:sns:us-east-1:123456789012:workshop-security-alerts\"}]' --region us-east-1
 > ```
 
 **✅ You should see** JSON output with `"FailedEntryCount": 0` — meaning the target was added successfully.
