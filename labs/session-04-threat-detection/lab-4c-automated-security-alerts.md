@@ -432,6 +432,10 @@ aws guardduty create-sample-findings --detector-id <DETECTOR_ID> --finding-types
 
 > **💡 What the email looks like:** The email contains raw JSON from the GuardDuty finding event. In a production environment, you would use a Lambda function between EventBridge and SNS to format the message into a human-readable alert with clear action items.
 
+Guardduty has a set behaviour regarding deduplication: If you do a second run (within 24hrs after cleanup), even though you deleted the detector and rebuilt everything, GuardDuty's backend will still have a recent record of that finding type for your account. When you call a create-sample-findings again with the same type, GuardDuty will treated it as an update to the existing finding (incrementing the count, updating the timestamp) rather than creating a new finding event. EventBridge only fires on new finding events, not on updates — so no email will be triggered.
+
+TLDR: GuardDuty deduplicates findings by type within a time window. This is by design to prevent alert fatigue — a single compromised resource triggering the same behavior 100 times generates one finding (updated), not 100 emails. In a real environment, you'd see the UpdatedAt and Count fields on the finding change, but only the initial detection fires through EventBridge.
+
 ---
 
 ### Step 14: Console Checkpoint
