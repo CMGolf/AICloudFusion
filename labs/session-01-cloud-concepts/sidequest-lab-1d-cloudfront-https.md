@@ -216,10 +216,9 @@ This is the full configuration for your CloudFront distribution. You will write 
 
 **Use your text editor (VS Code, Notepad++, etc)**
 
-📋 Copy and paste the entire block, **replacing all four placeholders**:
+📋 Copy and paste the entire block, **replacing placeholders**:
 - `<YOUR_BUCKET_NAME>` — your S3 bucket name
 - `<YOUR_REGION>` — the region your bucket is in (e.g., `us-east-1`)
-- `<YOUR_ACCOUNT_ID>` — your 12-digit account ID
 - `<YOUR_OAC_ID>` — the OAC ID from Step 4b
 
 ```json
