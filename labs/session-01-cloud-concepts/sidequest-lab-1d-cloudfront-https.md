@@ -591,7 +591,7 @@ aws cloudfront get-distribution-config --id <YOUR_DIST_ID> --query 'ETag' --outp
 Get the current config and save it to a file:
 
 ```
-aws cloudfront get-distribution-config --id <YOUR_DIST_ID> --query 'DistributionConfig' > current-dist-config.json
+aws cloudfront get-distribution-config --id <YOUR_DIST_ID> --query "DistributionConfig" | Out-File -FilePath current-dist-config.json -Encoding utf8
 ```
 
 Now disable the distribution — open `current-dist-config.json` in a text editor, change `"Enabled": true` to `"Enabled": false`, save, then run:
