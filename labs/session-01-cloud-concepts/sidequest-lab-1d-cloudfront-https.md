@@ -591,10 +591,10 @@ aws cloudfront get-distribution-config --id <YOUR_DIST_ID> --query 'ETag' --outp
 Get the current config and save it to a file:
 
 ```
-aws cloudfront get-distribution-config --id <YOUR_DIST_ID> --query "DistributionConfig" | Out-File -FilePath current-dist-config.json -Encoding utf8
+aws cloudfront get-distribution-config --id <YOUR_DIST_ID> --query "DistributionConfig" | Out-File -FilePath current-dist-config.json -Encoding ascii
 ```
 
-Now disable the distribution — open `current-dist-config.json` in a text editor, change `"Enabled": true` to `"Enabled": false`, save, then run:
+Open `current-dist-config.json` in a text editor, in the PrideClass codeblock (controls which CloudFront edge locations your distribution will use), change `"Enabled": true` to `"Enabled": false`, save, then run:
 
 📋 Copy and paste, **replacing `<YOUR_DIST_ID>` and `<ETAG>`**:
 
