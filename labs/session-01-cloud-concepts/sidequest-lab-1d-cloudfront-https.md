@@ -614,6 +614,12 @@ aws cloudfront get-distribution --id <YOUR_DIST_ID> --query 'Distribution.Status
 
 Run this every 2 minutes until you see `Deployed` (this means the disable has been deployed). The `Enabled` flag in the config is now `false`.
 
+You can further confirm by running the below command and verify the false variable has been deployed:
+
+```
+aws cloudfront get-distribution --id <YOUR_DIST_ID> --query "{Status:Distribution.Status,Enabled:Distribution.DistributionConfig.Enabled}" --output table
+```
+
 ### Step 3: Delete the Distribution
 
 Get the current ETag again (it changes when you updated the distribution):
