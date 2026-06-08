@@ -3,7 +3,7 @@
 **Session:** 5 — Incident Response on AWS  
 **Track:** Cloud Security & IR  
 **Difficulty:** Advanced  
-**Estimated Time:** 45–55 minutes  
+**Estimated Time:** 55–70 minutes  
 **Target Cert:** AWS Security Specialty
 
 ---
@@ -12,10 +12,11 @@
 
 In this lab, you will:
 
-1. **Create a Lambda function** that automatically deactivates newly created access keys
-2. **Test the function manually** — prove it works by invoking it with a simulated event
-3. **Wire up EventBridge** — create a rule that triggers the Lambda whenever a new access key is created
-4. **Understand automated remediation** — how companies enforce "no long-lived credentials" policies
+1. **Check for an existing CloudTrail trail** — confirm or create one so EventBridge can receive API call events
+2. **Create a Lambda function** that automatically deactivates newly created access keys
+3. **Test the function manually** — prove it works by invoking it with a simulated event
+4. **Wire up EventBridge** — create a rule that triggers the Lambda whenever a new access key is created
+5. **Understand automated remediation** — how companies enforce "no long-lived credentials" policies
 
 By the end of this lab, you will have built a real automated incident response system. This is **SOAR** (Security Orchestration, Automation, and Response) — the same pattern used by enterprise security teams to respond to threats in seconds instead of hours.
 
@@ -37,14 +38,14 @@ By the end of this lab, you will have built a real automated incident response s
 | IAM | Identity and Access Management | Always Free |
 | AWS Lambda | Serverless compute | Free: 1M requests + 400,000 GB-seconds per month |
 | Amazon EventBridge | Event routing | Free for AWS service events |
+| AWS CloudTrail | API activity logging | Free for one management event trail per region |
+| Amazon S3 | Storage for CloudTrail logs | ~$0.00 for the tiny amount used in this lab |
 
 **Estimated cost for this lab: $0.00**
 
 ---
 
 ## Concepts
-
-Before we start, here is what each concept means:
 
 **SOAR (Security Orchestration, Automation, and Response)** is the practice of automating security operations. Instead of a human manually deactivating compromised credentials, a system detects the threat and responds automatically — in seconds, not hours.
 
@@ -53,13 +54,22 @@ Before we start, here is what each concept means:
 - Automatically isolating EC2 instances when GuardDuty detects compromise
 - Automatically revoking overly permissive security group rules
 
-**EventBridge** is AWS's event bus. It routes events from AWS services (like CloudTrail) to targets (like Lambda functions). When something happens in your account, EventBridge can trigger an automated response.
+**EventBridge** is AWS's event bus. It routes events from AWS services to targets like Lambda functions.
 
-**The Pattern:** CloudTrail records an API call → EventBridge matches the event against rules → Lambda executes the automated response. This pipeline runs 24/7 without human intervention.
+**Why CloudTrail is required for EventBridge:** The AWS Console's CloudTrail Event History shows the last 90 days of API calls and is always on — but it does **not** feed events into EventBridge. For EventBridge to receive `"AWS API Call via CloudTrail"` events, you must have an active CloudTrail *trail* configured. Without a trail, EventBridge never sees the events and your Lambda will never be triggered, even though the event appears in the console.
 
-**Why This Matters:** Manual incident response takes 30–60 minutes at best (human gets alert, reads it, logs in, takes action). Automated response takes 1–5 minutes (event → Lambda → remediation). For credential theft, those 30 minutes could mean the difference between a contained incident and a full breach.
-
-**CloudTrail → EventBridge Delay:** CloudTrail events are delivered to EventBridge within 5–15 minutes of the API call. This is not instant, but it is much faster than waiting for a human to notice and respond.
+**The Full Pipeline:**
+```
+Someone creates an access key
+       ↓ (seconds)
+CloudTrail trail records the event
+       ↓ (1–5 minutes)
+EventBridge matches the event pattern
+       ↓
+Lambda function is triggered
+       ↓
+Access key is automatically deactivated
+```
 
 ---
 
@@ -69,15 +79,13 @@ Commands are inside gray code boxes. **📋 Copy and paste** them into your term
 
 **Placeholders** look like `<THIS>` — replace them (including the `<` and `>`) with your actual values.
 
-Here are the placeholders you will use in this lab:
-
 | Placeholder | What to Replace It With | Example |
 |-------------|------------------------|---------|
 | `<YOUR_PROFILE_NAME>` | Your AWS CLI profile name from Lab 1A | `AdministratorAccess-123456789012` |
 | `<ACCOUNT_ID>` | Your 12-digit AWS account ID | `123456789012` |
-| `<LAMBDA_ARN>` | The ARN of your Lambda function (Step 6) | `arn:aws:lambda:us-east-1:123456789012:function:workshop-key-revoker` |
-| `<RULE_ARN>` | The ARN of your EventBridge rule (Step 9) | `arn:aws:events:us-east-1:123456789012:rule/workshop-auto-revoke` |
-| `<TEST_KEY_ID>` | The Access Key ID of the test user (Step 7) | `AKIAIOSFODNN7EXAMPLE` |
+| `<LAMBDA_ARN>` | The ARN of your Lambda function (Step 8) | `arn:aws:lambda:us-east-1:123456789012:function:workshop-key-revoker` |
+| `<RULE_ARN>` | The ARN of your EventBridge rule (Step 11) | `arn:aws:events:us-east-1:123456789012:rule/workshop-auto-revoke` |
+| `<TEST_KEY_ID>` | The Access Key ID of the test user (Step 9) | `AKIAIOSFODNN7EXAMPLE` |
 
 ---
 
@@ -105,15 +113,13 @@ export AWS_PROFILE="<YOUR_PROFILE_NAME>"
 aws sts get-caller-identity
 ```
 
-**✅ You should see** your account ID and role. If you get an error about an expired token, run `aws sso login --profile <YOUR_PROFILE_NAME>` first.
+**✅ You should see** your account ID and role.
 
 > **📝 Note your Account ID** (the 12-digit number): ______________________________
 
 ---
 
 ### Step 2: Create Your Project Folder
-
-**Step 2a: Create the folder**
 
 **Windows (PowerShell):**
 
@@ -126,34 +132,183 @@ cd ~\Desktop\workshop-lab-5c
 
 **macOS / Linux:**
 
-📋 Copy and paste:
-
 ```bash
 mkdir ~/Desktop/workshop-lab-5c
 cd ~/Desktop/workshop-lab-5c
 ```
 
-> **What does this do?** Creates a new folder on your Desktop called `workshop-lab-5c` and moves your terminal into that folder.
-
-**Step 2b: Verify you're in the right folder**
-
-📋 Copy and paste:
+Verify you are in the right folder:
 
 ```
 pwd
 ```
 
-**✅ You should see** a path ending in `workshop-lab-5c` (e.g., `C:\Users\YourName\Desktop\workshop-lab-5c` on Windows or `/Users/YourName/Desktop/workshop-lab-5c` on Mac).
+**✅ You should see** a path ending in `workshop-lab-5c`.
 
-> **💡 From now on, save ALL files you create in this lab to this folder.** When the lab says "save the file," save it here.
+> **💡 Save ALL files you create in this lab to this folder.**
 
 ---
 
-### Step 3: Create the Lambda IAM Role
+### Step 3: Check for an Existing CloudTrail Trail
+
+> **Why this step matters:** CloudTrail Event History (visible in the AWS Console) does NOT send events to EventBridge. You need an active CloudTrail *trail* for the automated pipeline to work. This step checks whether one already exists so you know what to do next.
+
+**Step 3a: List existing trails**
+
+📋 Copy and paste:
+
+```
+aws cloudtrail describe-trails --region us-east-1
+```
+
+**Read the output and follow the path that matches your situation:**
+
+---
+
+#### Path A — No trails exist (empty `trailList`)
+
+If you see `"trailList": []`, skip to **Step 4**.
+
+---
+
+#### Path B — A trail exists but it is the workshop trail from a previous attempt
+
+If you see a trail named `<TRAILNAME>`, delete it now so you start clean.
+
+**Step 3b (Path B only): Check if the trail is currently logging**
+
+📋 Copy and paste:
+
+```
+aws cloudtrail get-trail-status --name <TRAILNAME> --region us-east-1
+```
+
+Look for `"IsLogging": true` or `false`.
+
+**Step 3c (Path B only): Stop logging if it is active**
+
+If `IsLogging` was `true`:
+
+```
+aws cloudtrail stop-logging --name <TRAILNAME> --region us-east-1
+```
+
+**Step 3d (Path B only): Delete the trail**
+
+```
+aws cloudtrail delete-trail --name <TRAILNAME> --region us-east-1
+```
+
+**✅ No output means success.** Skip to **Step 4**.
+
+---
+
+#### Path C — A trail exists that you are using for something else.
+
+If you have an established trail, and are confident in what you are doing, you can ignore it can create a new trail. Note however that any trail running after the first one will incur costs.
+
+---
+
+### Step 4: Create an S3 Bucket for CloudTrail Logs
+
+CloudTrail requires an S3 bucket to store log files. You will create a dedicated bucket for this lab.
+
+**Step 4a: Create the bucket**:
+
+```
+aws s3api create-bucket --bucket <STUDENT>-workshop-cloudtrail --region us-east-1
+```
+
+**✅ You should see** JSON with the bucket location.
+
+> **What does this do?** Creates a private S3 bucket where CloudTrail will write its log files. The bucket name must be globally unique — you will get an error if the bucket name already exists.
+
+**Step 4b: Create the bucket policy**
+
+Open your text editor and create a **new, empty file**.
+
+📋 Copy and paste this entire block into the file, **replacing `<STUDENT>` in all two places and `<ACCOUNT_ID>` in one place**:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AWSCloudTrailAclCheck",
+            "Effect": "Allow",
+            "Principal": {"Service": "cloudtrail.amazonaws.com"},
+            "Action": "s3:GetBucketAcl",
+            "Resource": "arn:aws:s3:::<STUDENT>-workshop-cloudtrail"
+        },
+        {
+            "Sid": "AWSCloudTrailWrite",
+            "Effect": "Allow",
+            "Principal": {"Service": "cloudtrail.amazonaws.com"},
+            "Action": "s3:PutObject",
+            "Resource": "arn:aws:s3:::<STUDENT>-workshop-cloudtrail/AWSLogs/<ACCOUNT_ID>/*",
+            "Condition": {
+                "StringEquals": {"s3:x-amz-acl": "bucket-owner-full-control"}
+            }
+        }
+    ]
+}
+```
+
+Save the file as `bucket-policy.json` in your `workshop-lab-5c` folder.
+
+**Step 4c: Apply the bucket policy** (replace `<STUDENT>`):
+
+```
+aws s3api put-bucket-policy --bucket <STUDENT>-workshop-cloudtrail --policy file://bucket-policy.json
+```
+
+**✅ No output means success.**
+
+> **What does this do?** Grants the CloudTrail service permission to check and write to your bucket. Without this policy, CloudTrail will refuse to use the bucket.
+
+---
+
+### Step 5: Create and Start the CloudTrail Trail
+
+**Step 5a: Create the trail** (replace `<STUDENT>`):
+
+```
+aws cloudtrail create-trail --name workshop-trail --s3-bucket-name <STUDENT>-workshop-cloudtrail --is-multi-region-trail
+```
+
+**✅ You should see** JSON with the trail details including a `TrailARN`.
+
+> **What does `--is-multi-region-trail` do?** Makes the trail capture API calls from all AWS regions, not just us-east-1. Since IAM is a global service, its events appear in us-east-1 — but the multi-region flag ensures nothing is missed.
+
+**Step 5b: Start logging**
+
+📋 Copy and paste:
+
+```
+aws cloudtrail start-logging --name workshop-trail
+```
+
+**✅ No output means success.**
+
+**Step 5c: Confirm logging is active**
+
+📋 Copy and paste:
+
+```
+aws cloudtrail get-trail-status --name workshop-trail --region us-east-1
+```
+
+**✅ You should see** `"IsLogging": true`.
+
+> **🎉 EventBridge can now receive CloudTrail events.** Any API call in your account will flow through the pipeline: CloudTrail trail → EventBridge → Lambda.
+
+---
+
+### Step 6: Create the Lambda IAM Role
 
 The Lambda function needs permission to deactivate access keys. You will create an IAM role that grants this.
 
-**Step 3a: Create the trust policy**
+**Step 6a: Create the trust policy**
 
 Open your text editor and create a **new, empty file**.
 
@@ -176,9 +331,7 @@ Open your text editor and create a **new, empty file**.
 
 Save the file as `trust-policy.json` in your `workshop-lab-5c` folder.
 
-> **What does this do?** This trust policy allows the Lambda service to assume this role. Without it, Lambda cannot use the role's permissions.
-
-**Step 3b: Create the IAM role**
+**Step 6b: Create the IAM role and attach the policy**
 
 📋 Copy and paste:
 
@@ -186,9 +339,9 @@ Save the file as `trust-policy.json` in your `workshop-lab-5c` folder.
 aws iam create-role --role-name workshop-key-revoker-role --assume-role-policy-document file://trust-policy.json
 ```
 
-**✅ You should see** JSON output with the role details, including an ARN.
+**✅ You should see** JSON output with the role details including an ARN.
 
-**Step 3c: Attach the IAMFullAccess policy**
+**Step 6c: Attach the IAMFullAccess policy**
 
 📋 Copy and paste:
 
@@ -200,7 +353,7 @@ aws iam attach-role-policy --role-name workshop-key-revoker-role --policy-arn ar
 
 > **⚠️ In production**, you would use a least-privilege policy that only allows `iam:UpdateAccessKey`. We use `IAMFullAccess` here for simplicity in a lab environment.
 
-**Step 3d: Attach the Lambda basic execution policy**
+**Step 6d: Attach the Lambda basic execution policy**
 
 📋 Copy and paste:
 
@@ -210,15 +363,15 @@ aws iam attach-role-policy --role-name workshop-key-revoker-role --policy-arn ar
 
 **✅ No output means success.**
 
-> **What does this do?** `AWSLambdaBasicExecutionRole` allows the Lambda function to write logs to CloudWatch. Without this, you cannot see the function's output or debug errors.
+> **What does this do?** Allows the Lambda function to write logs to CloudWatch so you can see its output and debug errors.
 
 ---
 
-### Step 4: Write the Lambda Function
+### Step 7: Write the Lambda Function
 
-**Step 4a:** Open your text editor and create a **new, empty file**.
+**Step 7a:** Open your text editor and create a **new, empty file**.
 
-**Step 4b:** 📋 Copy and paste this entire Python function into the file:
+**Step 7b:** 📋 Copy and paste this entire Python function into the file:
 
 ```python
 import json
@@ -231,17 +384,17 @@ def lambda_handler(event, context):
     detail = event.get('detail', {})
     request_params = detail.get('requestParameters', {})
     response_elements = detail.get('responseElements', {})
-    
+
     username = request_params.get('userName', 'unknown')
-    
+
     # The access key ID is in the response elements
     access_key_info = response_elements.get('accessKey', {})
     access_key_id = access_key_info.get('accessKeyId', '')
-    
+
     if not access_key_id:
         print(f"No access key ID found in event for user {username}")
         return {'statusCode': 400, 'body': 'No access key ID found'}
-    
+
     # Deactivate the access key
     try:
         iam_client.update_access_key(
@@ -258,25 +411,15 @@ def lambda_handler(event, context):
         return {'statusCode': 500, 'body': error_msg}
 ```
 
-**Step 4c:** Save the file as `revoke_key.py` in your `workshop-lab-5c` folder.
-
-> **What does this function do?**
-> 1. Receives a CloudTrail event (via EventBridge) that says "a new access key was created"
-> 2. Extracts the username and access key ID from the event
-> 3. Immediately deactivates the access key
-> 4. Logs a security alert message
->
-> This enforces a "no long-lived credentials" policy — any new access key is automatically deactivated within minutes of creation.
+**Step 7c:** Save the file as `revoke_key.py` in your `workshop-lab-5c` folder.
 
 ---
 
-### Step 5: Package and Deploy the Lambda Function
+### Step 8: Package and Deploy the Lambda Function
 
-**Step 5a: Zip the function code**
+**Step 8a: Zip the function code**
 
 **Windows (PowerShell):**
-
-📋 Copy and paste:
 
 ```powershell
 Compress-Archive -Path revoke_key.py -DestinationPath revoke_key.zip -Force
@@ -284,69 +427,57 @@ Compress-Archive -Path revoke_key.py -DestinationPath revoke_key.zip -Force
 
 **macOS / Linux:**
 
-📋 Copy and paste:
-
 ```bash
 zip revoke_key.zip revoke_key.py
 ```
 
-**Step 5b: Deploy the Lambda function**
-
-📋 Copy and paste, **replacing `<ACCOUNT_ID>`** with your 12-digit AWS account ID:
+**Step 8b: Deploy the Lambda function** (replace `<ACCOUNT_ID>`):
 
 ```
 aws lambda create-function --function-name workshop-key-revoker --runtime python3.12 --role arn:aws:iam::<ACCOUNT_ID>:role/workshop-key-revoker-role --handler revoke_key.lambda_handler --zip-file fileb://revoke_key.zip --region us-east-1 --timeout 30
 ```
 
-**✅ You should see** JSON output with the function details, including a `FunctionArn`.
+**✅ You should see** JSON output with a `FunctionArn`.
 
 > **📝 Write down the FunctionArn:** ______________________________
 >
 > It looks like: `arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:workshop-key-revoker`
 
-> **💡 If you get an error** about the role not being found or "The role defined for the function cannot be assumed by Lambda": Wait 10 seconds and try again. IAM role propagation can take a few seconds.
+> **💡 If you get a role error:** Wait 10 seconds and try again — IAM role propagation can take a few seconds.
 
 ---
 
-### Step 6: Test the Lambda Function (Manual Invoke)
+### Step 9: Test the Lambda Function (Manual Invoke)
 
-Before wiring up EventBridge, let's prove the Lambda function works by invoking it manually with a simulated event.
+Before wiring up EventBridge, prove the Lambda works by invoking it manually with a simulated event.
 
-**Step 6a: Create a test IAM user**
-
-📋 Copy and paste:
+**Step 9a: Create a test IAM user**
 
 ```
 aws iam create-user --user-name auto-revoke-test
 ```
 
-**Step 6b: Create an access key for the test user**
-
-📋 Copy and paste:
+**Step 9b: Create an access key for the test user**
 
 ```
 aws iam create-access-key --user-name auto-revoke-test
 ```
 
-**✅ You should see** JSON output with `AccessKeyId` and `SecretAccessKey`.
+**✅ You should see** JSON with `AccessKeyId` and `SecretAccessKey`.
 
 > **📝 Write down the AccessKeyId:** ______________________________
 
-**Step 6c: Verify the key is Active**
-
-📋 Copy and paste:
+**Step 9c: Verify the key is Active**
 
 ```
 aws iam list-access-keys --user-name auto-revoke-test --query "AccessKeyMetadata[].{Id:AccessKeyId,Status:Status}" --output table
 ```
 
-**✅ You should see** the key with Status `Active`.
-
-**Step 6d: Create the test event**
+**Step 9d: Create the test event**
 
 Open your text editor and create a **new, empty file**.
 
-📋 Copy and paste this entire block into the file, **replacing `<TEST_KEY_ID>`** with the AccessKeyId from Step 6b:
+📋 Copy and paste this entire block, **replacing `<TEST_KEY_ID>`** with the AccessKeyId from Step 9b:
 
 ```json
 {
@@ -368,38 +499,23 @@ Open your text editor and create a **new, empty file**.
 
 Save the file as `test-event.json` in your `workshop-lab-5c` folder.
 
-> **What does this do?** This simulates the CloudTrail event that EventBridge would send when a new access key is created. It contains the username and key ID that the Lambda function needs.
-
-**Step 6e: Invoke the Lambda function**
-
-📋 Copy and paste:
+**Step 9e: Invoke the Lambda function**
 
 ```
 aws lambda invoke --function-name workshop-key-revoker --payload file://test-event.json --cli-binary-format raw-in-base64-out response.json --region us-east-1
 ```
 
-**✅ You should see:**
+**✅ You should see** `"StatusCode": 200`.
 
-```json
-{
-    "StatusCode": 200,
-    "ExecutedVersion": "$LATEST"
-}
-```
-
-**Step 6f: Check the response**
+**Step 9f: Check the response**
 
 **Windows (PowerShell):**
-
-📋 Copy and paste:
 
 ```powershell
 Get-Content response.json
 ```
 
 **macOS / Linux:**
-
-📋 Copy and paste:
 
 ```bash
 cat response.json
@@ -411,29 +527,39 @@ cat response.json
 {"statusCode": 200, "body": "SECURITY ALERT: Deactivated access key <TEST_KEY_ID> for user auto-revoke-test"}
 ```
 
-**Step 6g: Verify the key is now Inactive**
-
-📋 Copy and paste:
+**Step 9g: Verify the key is now Inactive**
 
 ```
 aws iam list-access-keys --user-name auto-revoke-test --query "AccessKeyMetadata[].{Id:AccessKeyId,Status:Status}" --output table
 ```
 
-**✅ You should see** the key with Status `Inactive`.
+**✅ You should see** Status `Inactive`.
 
-> **🎉 The Lambda function works!** It successfully received the event, extracted the key information, and deactivated the access key. This proves your automated remediation logic is correct.
+> **🎉 The Lambda function works!** This proves your automated remediation logic is correct.
 
 ---
 
-### Step 7: Wire Up EventBridge (Automation Layer)
+### Step 10: Delete the Test Key Before Wiring Up EventBridge
 
-Now connect EventBridge so the Lambda function runs automatically whenever a new access key is created.
+> **⚠️ Important:** Delete the test user's deactivated key before continuing. The next step will make the pipeline live — any key created after that will be automatically deactivated.
 
-**Step 7a: Create the event pattern**
+**Delete the inactive test key** (replace `<TEST_KEY_ID>`):
+
+```
+aws iam delete-access-key --user-name auto-revoke-test --access-key-id <TEST_KEY_ID>
+```
+
+**✅ No output means success.**
+
+---
+
+### Step 11: Wire Up EventBridge (Automation Layer)
+
+**Step 11a: Create the event pattern**
 
 Open your text editor and create a **new, empty file**.
 
-📋 Copy and paste this entire block into the file:
+📋 Copy and paste:
 
 ```json
 {
@@ -448,121 +574,108 @@ Open your text editor and create a **new, empty file**.
 
 Save the file as `eventbridge-pattern.json` in your `workshop-lab-5c` folder.
 
-> **What does this do?** This event pattern tells EventBridge: "Match any CloudTrail event where someone calls the `CreateAccessKey` API on IAM." When this pattern matches, EventBridge will trigger the Lambda function.
-
-**Step 7b: Create the EventBridge rule**
-
-📋 Copy and paste:
+**Step 11b: Create the EventBridge rule**
 
 ```
 aws events put-rule --name workshop-auto-revoke --event-pattern file://eventbridge-pattern.json --state ENABLED --region us-east-1
 ```
 
-**✅ You should see** JSON output with a `RuleArn`:
-
-```json
-{
-    "RuleArn": "arn:aws:events:us-east-1:<ACCOUNT_ID>:rule/workshop-auto-revoke"
-}
-```
+**✅ You should see** a `RuleArn` in the output.
 
 > **📝 Write down the RuleArn:** ______________________________
 
-**Step 7c: Add Lambda as the target**
-
-📋 Copy and paste, **replacing `<LAMBDA_ARN>`** with the FunctionArn from Step 5b:
+**Step 11c: Add Lambda's FunctionArn as the target** (replace `<LAMBDA_ARN>`):
 
 ```
 aws events put-targets --rule workshop-auto-revoke --targets "Id=lambda-target,Arn=<LAMBDA_ARN>" --region us-east-1
 ```
 
-**✅ You should see:**
+**✅ You should see** `"FailedEntryCount": 0`.
 
-```json
-{
-    "FailedEntryCount": 0,
-    "FailedEntries": []
-}
-```
-
-**Step 7d: Grant EventBridge permission to invoke Lambda**
-
-📋 Copy and paste, **replacing `<RULE_ARN>`** with the RuleArn from Step 7b:
+**Step 11d: Grant EventBridge permission to invoke Lambda** (replace `<RULE_ARN>`):
 
 ```
 aws lambda add-permission --function-name workshop-key-revoker --statement-id eventbridge-invoke --action lambda:InvokeFunction --principal events.amazonaws.com --source-arn <RULE_ARN> --region us-east-1
 ```
 
-**✅ You should see** JSON output with a `Statement` field.
-
-> **What does this do?** Grants the EventBridge service permission to invoke your Lambda function. Without this, EventBridge would match the event but fail to trigger the function.
+**✅ You should see** JSON with a `Statement` field.
 
 ---
 
-### Step 8: Understanding the Automation
+### Step 12: Trigger the Automated Pipeline
 
-> **🎉 Congratulations!** You have built a complete automated incident response system:
->
-> ```
-> Someone creates an access key
->        ↓ (5-15 minutes)
-> CloudTrail records the event
->        ↓
-> EventBridge matches the event pattern
->        ↓
-> Lambda function is triggered
->        ↓
-> Access key is automatically deactivated
-> ```
->
-> **In production, this means:**
-> - No human needs to be awake or available
-> - Response happens in minutes, not hours
-> - Every new access key is automatically deactivated
-> - Users are forced to use SSO/roles instead of long-lived keys
->
-> **About the 5–15 minute delay:** CloudTrail events are delivered to EventBridge within 5–15 minutes. The manual invoke in Step 6 proved the Lambda works instantly. The EventBridge wiring ensures it runs automatically — you just need to account for the CloudTrail delivery delay.
->
-> **⚠️ Important:** While this EventBridge rule is active, any new access key created in your account will be automatically deactivated within minutes. This is why cleanup order matters — disable the rule BEFORE creating any new access keys.
+Now create a new access key for your test user and watch the full pipeline run automatically.
+
+**Step 12a: Create a new access key**
+
+```
+aws iam create-access-key --user-name auto-revoke-test
+```
+
+> **📝 Write down this new AccessKeyId:** ______________________________
+
+**Step 12b: Wait 1–5 minutes**, then check whether the key was automatically deactivated:
+
+```
+aws iam list-access-keys --user-name auto-revoke-test --query "AccessKeyMetadata[].{Id:AccessKeyId,Status:Status}" --output table
+```
+
+**✅ You should see** the key with Status `Inactive` — deactivated automatically by Lambda.
+
+**Step 12c: Check the Lambda logs to see the execution**
+
+```
+aws logs tail /aws/lambda/workshop-key-revoker --region us-east-1 --since 10m
+```
+
+**✅ You should see** a log line like:
+
+```
+SECURITY ALERT: Deactivated access key AKIA... for user auto-revoke-test
+```
+
+> **🎉 The full automated pipeline is working!** CloudTrail recorded the key creation, EventBridge matched it, and Lambda deactivated the key — all without human intervention.
 
 ---
 
-### Step 9: Console Checkpoint
+### Step 13: Understanding What You Built
 
-Let's verify what you built in the AWS Console:
+```
+Someone creates an access key
+       ↓ (seconds)
+CloudTrail trail records the event
+       ↓ (1–5 minutes)
+EventBridge matches the event pattern
+       ↓ (milliseconds)
+Lambda function is triggered
+       ↓ (milliseconds)
+Access key is automatically deactivated
+```
+
+**In production, this means:**
+- No human needs to be awake or available
+- Response happens in minutes, not hours
+- Every new access key is automatically deactivated
+- Users are forced to use SSO/roles instead of long-lived keys
+
+---
+
+### Step 14: Console Checkpoint
 
 1. Go to [https://console.aws.amazon.com/](https://console.aws.amazon.com/)
-2. Search for **Lambda** in the top search bar and click it
-3. Make sure you are in the **us-east-1** region
-4. Click **Functions** — you should see `workshop-key-revoker`
-5. Click on the function — you can see the code, configuration, and triggers
-6. Now search for **EventBridge** in the top search bar and click it
-7. Click **Rules** in the left sidebar
-8. Select the **default** event bus
-9. You should see `workshop-auto-revoke` rule with status **Enabled**
-10. Click on the rule — you can see the event pattern and the Lambda target
-
-**✅ Checkpoint:** You can see both the Lambda function and the EventBridge rule in the console. The rule is enabled and targeting your Lambda function. This is a production-ready automated remediation pipeline.
+2. Search for **Lambda** → click `workshop-key-revoker` → check the **Monitor** tab for invocation metrics
+3. Search for **CloudTrail** → click **Trails** → confirm `workshop-trail` is active
+4. Search for **EventBridge** → click **Rules** → confirm `workshop-auto-revoke` is Enabled with the Lambda target
 
 ---
 
 ## What You Just Did
 
-You built an automated incident response system (SOAR):
-
-1. **Created a Lambda function** that deactivates access keys on demand
-2. **Tested it manually** — proved the logic works with a simulated event
-3. **Wired up EventBridge** — connected CloudTrail events to automatic Lambda execution
-4. **Understood the pipeline** — CloudTrail → EventBridge → Lambda → Remediation
-
-This is the same pattern used by companies like Netflix, Capital One, and Airbnb to enforce security policies at scale. Instead of relying on humans to catch and respond to every security event, they automate the response.
-
-**Real-world applications of this pattern:**
-- Automatically deactivate access keys (enforce SSO-only)
-- Automatically isolate EC2 instances when GuardDuty detects compromise
-- Automatically revoke overly permissive security group rules
-- Automatically send alerts to PagerDuty/Slack when high-severity findings appear
-- Automatically create forensic snapshots before terminating compromised instances
+1. **Confirmed or created a CloudTrail trail** — the missing piece that enables EventBridge to receive API call events
+2. **Created a Lambda function** that deactivates access keys on demand
+3. **Tested it manually** — proved the logic works with a simulated event
+4. **Wired up EventBridge** — connected live CloudTrail events to automatic Lambda execution
+5. **Watched the full pipeline run** — created a real key and saw it auto-deactivated
 
 ---
 
@@ -570,15 +683,14 @@ This is the same pattern used by companies like Netflix, Capital One, and Airbnb
 
 **Target Certification:** AWS Security Specialty (SCS-C02)
 
-The Security Specialty exam tests automated remediation heavily. You need to understand:
-- The EventBridge + Lambda pattern for automated response
-- How CloudTrail events flow to EventBridge
-- Event patterns and how to match specific API calls
-- The difference between manual and automated incident response
-- SOAR concepts and when to apply them
+Key facts the exam tests on this pattern:
+- CloudTrail Event History does **not** send events to EventBridge — an active trail is required
+- EventBridge + Lambda is the standard automated remediation pattern
+- CloudTrail → EventBridge delay is typically 1–5 minutes for management events
+- SOAR replaces human response time (30–60 min) with automated response (1–5 min)
 
-**Sample question type:** "A company wants to automatically disable any newly created IAM access keys to enforce their SSO-only policy. Which combination of services achieves this?"  
-**Answer:** CloudTrail + EventBridge + Lambda (CloudTrail records the CreateAccessKey event, EventBridge matches it, Lambda deactivates the key)
+**Sample question:** "A company wants to automatically disable any newly created IAM access keys. Their EventBridge rule is configured correctly but Lambda is never triggered. What is the most likely cause?"  
+**Answer:** No active CloudTrail trail is configured. CloudTrail Event History does not send events to EventBridge.
 
 ---
 
@@ -586,32 +698,27 @@ The Security Specialty exam tests automated remediation heavily. You need to und
 
 | Issue | What It Means | How to Fix It |
 |-------|--------------|---------------|
-| `The role defined for the function cannot be assumed by Lambda` | IAM role has not propagated yet | Wait 10 seconds and try the `create-function` command again |
-| Lambda invoke returns `statusCode: 400` | The test event JSON is malformed or missing the key ID | Open `test-event.json` and verify you replaced `<TEST_KEY_ID>` with the actual key ID |
-| Lambda invoke returns `statusCode: 500` | The Lambda role does not have IAM permissions | Verify you attached `IAMFullAccess` to the role in Step 3c |
-| `put-targets` returns `FailedEntryCount: 1` | The Lambda ARN is wrong | Double-check the ARN from Step 5b. It should start with `arn:aws:lambda:us-east-1:` |
-| `add-permission` returns an error about existing statement | You already ran this command | This is fine — the permission already exists |
-| EventBridge rule does not trigger Lambda | CloudTrail → EventBridge takes 5–15 minutes | This is expected. The manual invoke in Step 6 proved the Lambda works. |
+| Lambda never triggers (no CloudWatch logs) | No active CloudTrail trail | Complete Steps 4–5 to create and start a trail |
+| `IsLogging: false` on the trail | Trail exists but logging was stopped | Run `aws cloudtrail start-logging --name workshop-trail` |
+| Lambda invoke returns `statusCode: 400` | Test event JSON is malformed or missing key ID | Verify you replaced `<TEST_KEY_ID>` in `test-event.json` |
+| Lambda invoke returns `statusCode: 500` | Lambda role lacks IAM permissions | Verify you attached `IAMFullAccess` in Step 6c |
+| `put-targets` returns `FailedEntryCount: 1` | Lambda ARN is wrong | Double-check the ARN from Step 8b |
+| `add-permission` error: statement already exists | You already ran this command | The permission exists — this is fine, continue |
+| Key still Active after 10 minutes | Pipeline not fully connected | Check CloudWatch logs: `aws logs tail /aws/lambda/workshop-key-revoker --region us-east-1 --since 15m` |
 
 ---
 
 ## Cleanup
 
-**⚠️ IMPORTANT: Follow this cleanup order exactly.** You must disable the EventBridge rule BEFORE deleting other resources. If you create access keys while the rule is active, the Lambda will deactivate them.
+**⚠️ Follow this cleanup order exactly.** Disable EventBridge first to prevent the Lambda from interfering with keys you create during cleanup.
 
-### Step 1: Remove EventBridge Targets
-
-📋 Copy and paste:
+### Cleanup Step 1: Remove EventBridge Targets
 
 ```
 aws events remove-targets --rule workshop-auto-revoke --ids lambda-target --region us-east-1
 ```
 
-**✅ You should see** `"FailedEntryCount": 0`.
-
-### Step 2: Delete the EventBridge Rule
-
-📋 Copy and paste:
+### Cleanup Step 2: Delete the EventBridge Rule
 
 ```
 aws events delete-rule --name workshop-auto-revoke --region us-east-1
@@ -619,19 +726,15 @@ aws events delete-rule --name workshop-auto-revoke --region us-east-1
 
 **✅ No output means success.**
 
-### Step 3: Delete the Lambda Function
-
-📋 Copy and paste:
+### Cleanup Step 3: Delete the Lambda Function
 
 ```
 aws lambda delete-function --function-name workshop-key-revoker --region us-east-1
 ```
 
-**✅ You should see JSON output with a `"StatusCode": 204` field.** which means the delete-function request succeeded.
+**✅ You should see** JSON with a `"StatusCode": 204` which means the command was executed successfully.
 
-### Step 4: Detach Policies and Delete the IAM Role
-
-📋 Copy and paste each command:
+### Cleanup Step 4: Detach Policies and Delete the IAM Role
 
 ```
 aws iam detach-role-policy --role-name workshop-key-revoker-role --policy-arn arn:aws:iam::aws:policy/IAMFullAccess
@@ -644,26 +747,63 @@ aws iam detach-role-policy --role-name workshop-key-revoker-role --policy-arn ar
 ```
 aws iam delete-role --role-name workshop-key-revoker-role
 ```
+**✅ No output for each of these 3 commands means success.**
 
-**✅ No output for each command means success.**
+### Cleanup Step 5: Delete the Test User and Access Keys
 
-### Step 5: Delete the Test User and Access Key
-
-📋 Copy and paste, **replacing `<TEST_KEY_ID>`** with the key ID from Step 6b:
+First, list any remaining keys (replace if needed):
 
 ```
-aws iam delete-access-key --user-name auto-revoke-test --access-key-id <TEST_KEY_ID>
+aws iam list-access-keys --user-name auto-revoke-test
 ```
+
+Delete each key listed (replace `<KEY_ID>`):
+
+```
+aws iam delete-access-key --user-name auto-revoke-test --access-key-id <KEY_ID>
+```
+
+Delete the user:
 
 ```
 aws iam delete-user --user-name auto-revoke-test
 ```
 
-**✅ No output for each command means success.**
+### Cleanup Step 6: Stop and Delete the CloudTrail Trail
 
-### Step 6: Delete Local Files
+```
+aws cloudtrail stop-logging --name workshop-trail
+```
 
-Remove the project folder:
+```
+aws cloudtrail delete-trail --name workshop-trail
+```
+
+Verify the trail has been deleted:
+
+```
+aws cloudtrail describe-trails --region us-east-1
+```
+
+If you see `"trailList": []` the deletion is confirmed.
+
+### Cleanup Step 7: Empty and Delete the S3 Bucket (replace `<ACCOUNT_ID>`)
+
+```
+aws s3 rm s3://<STUDENT>-workshop-cloudtrail --recursive
+```
+
+```
+aws s3api delete-bucket --bucket <STUDENT>-workshop-cloudtrail --region us-east-1
+```
+
+Verify bucket is deleted:
+
+```
+aws s3 ls
+```
+
+### Cleanup Step 8: Delete Local Files
 
 **Windows (PowerShell):**
 
@@ -675,7 +815,6 @@ Remove-Item -Recurse -Force ~\Desktop\workshop-lab-5c
 **macOS / Linux:**
 
 ```bash
-cd ~/Desktop
 rm -rf ~/Desktop/workshop-lab-5c
 ```
 
@@ -685,6 +824,6 @@ rm -rf ~/Desktop/workshop-lab-5c
 
 If you get stuck, post your question in the **Lab Help** channel on Microsoft Teams. Include:
 1. The **step number** you are on
-2. The **command** you ran (copy and paste it)
-3. The **full error message** you received (copy and paste it)
+2. The **command** you ran
+3. The **full error message** you received
 4. Your **operating system** (Windows, Mac, or Linux)
