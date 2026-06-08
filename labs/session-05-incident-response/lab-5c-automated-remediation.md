@@ -627,7 +627,7 @@ aws events delete-rule --name workshop-auto-revoke --region us-east-1
 aws lambda delete-function --function-name workshop-key-revoker --region us-east-1
 ```
 
-**✅ No output means success.**
+**✅ You should see JSON output with a `"StatusCode": 204` field.** which means the delete-function request succeeded.
 
 ### Step 4: Detach Policies and Delete the IAM Role
 
