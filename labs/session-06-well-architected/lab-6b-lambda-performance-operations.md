@@ -317,6 +317,8 @@ Primes found: 5133 (up to 50000)
 >
 > Your number will be different, but it should be somewhere around **600–800 ms**. This is slow for a function that should complete quickly.
 
+> **💡 Run it 2–3 times.** Lambda runs on shared hardware, so any single run can vary. Invoke the command above a few times and use a typical value (ignore any one-off spikes). This gives you a reliable baseline to compare against.
+
 > **💡 On macOS/Linux:** The raw JSON output will have `\n` characters. Look for the number after `Computation time:` — that is the key metric.
 
 ---
@@ -374,6 +376,8 @@ Primes found: 5133 (up to 50000)
 > **📝 Write down the new `Computation time` value:** ______ ms
 >
 > Your number should be roughly **half** of what it was at 128 MB (around **300–400 ms**).
+
+> **💡 Run it 2–3 times here too** and use a typical value, for the same shared-hardware reason. Compare the typical 256 MB time against the typical 128 MB time from Step 6.
 
 ---
 
