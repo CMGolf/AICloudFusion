@@ -33,6 +33,7 @@ Work through the labs in order (A → B → C). Each lab includes:
 | 3 | Cloud Security Fundamentals | [Lab 3A: IAM Least Privilege](session-03-cloud-security/lab-3a-iam-least-privilege.md) · [Lab 3B: Groups, Custom Policy & MFA](session-03-cloud-security/lab-3b-groups-custom-policy-mfa.md) · [Lab 3C: Roles & CloudTrail Audit](session-03-cloud-security/lab-3c-roles-cloudtrail-audit.md) |
 | 4 | Threat Detection & AWS Security Services | [Lab 4A: GuardDuty Findings](session-04-threat-detection/lab-4a-guardduty-findings.md) · [Lab 4B: CloudTrail Investigation](session-04-threat-detection/lab-4b-cloudtrail-investigation.md) · [Lab 4C: Automated Security Alerts](session-04-threat-detection/lab-4c-automated-security-alerts.md) |
 | 5 | Incident Response on AWS | [Lab 5A: Credential Revocation](session-05-incident-response/lab-5a-credential-revocation.md) · [Lab 5B: Investigate & Report](session-05-incident-response/lab-5b-investigate-and-report.md) · [Lab 5C: Automated Remediation](session-05-incident-response/lab-5c-automated-remediation.md) |
+| 6 | AWS Well-Architected Framework | [Lab 6A: S3 Security & Reliability](session-06-well-architected/lab-6a-s3-security-reliability.md) *(6B, 6C coming soon)* |
 
 *More sessions coming soon.*
 
