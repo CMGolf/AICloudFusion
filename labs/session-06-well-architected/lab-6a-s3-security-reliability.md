@@ -761,7 +761,7 @@ aws s3api list-object-versions --bucket $BUCKET --query "[Versions,DeleteMarkers
 
 **✅ You should see** `[null,null]` or empty lists. If you still see versions, repeat Step 2 for the remaining IDs.
 
-### Step 3: Delete the bucket
+### Step 4: Delete the bucket
 
 📋 Copy and paste:
 
@@ -777,7 +777,7 @@ aws s3 rb s3://$BUCKET
 
 **✅ You should see:** `remove_bucket: <your bucket>`
 
-### Step 4: Delete local files
+### Step 5: Delete local files
 
 **Windows (PowerShell):**
 ```powershell
