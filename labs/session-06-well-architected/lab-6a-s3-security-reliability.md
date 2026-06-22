@@ -490,7 +490,7 @@ You will add a bucket policy that **explicitly denies** access to everyone EXCEP
 
 **Step 8a: Create the restrictive bucket policy**
 
-Open your text editor and create a **new, empty file**. 📋 Copy and paste this, **replacing `BUCKET_NAME_HERE` with your bucket name** and **replacing `ACCOUNT_ID_HERE` with your 12-digit account ID** (in both places):
+Open your text editor and create a **new, empty file**. 📋 Copy and paste this, **replacing `<BUCKET_NAME>` with your bucket name** and **replacing `<ACCOUNT_ID>` with your 12-digit account ID** (in both places):
 
 ```json
 {
@@ -501,12 +501,12 @@ Open your text editor and create a **new, empty file**. 📋 Copy and paste this
             "Effect": "Deny",
             "Principal": "*",
             "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::BUCKET_NAME_HERE/*",
+            "Resource": "arn:aws:s3:::<BUCKET_NAME>/*",
             "Condition": {
                 "StringNotLike": {
                     "aws:PrincipalArn": [
-                        "arn:aws:iam::ACCOUNT_ID_HERE:role/workshop-hr-team-role",
-                        "arn:aws:iam::ACCOUNT_ID_HERE:role/AWSReservedSSO_AdministratorAccess_*"
+                        "arn:aws:iam::<ACCOUNT_ID>:role/workshop-hr-team-role",
+                        "arn:aws:iam::<ACCOUNT_ID>:role/AWSReservedSSO_AdministratorAccess_*"
                     ]
                 }
             }
@@ -516,12 +516,12 @@ Open your text editor and create a **new, empty file**. 📋 Copy and paste this
 ```
 
 **Replace in 2 places:**
-1. Replace `BUCKET_NAME_HERE` with your bucket name (e.g., `jane-doe-waf-lab6a`)
-2. Replace `ACCOUNT_ID_HERE` with your account ID (e.g., `123456789012`) — this appears **twice** in the file
+1. Replace `<BUCKET_NAME>` with your bucket name (e.g., `jane-doe-waf-lab6a`)
+2. Replace `<ACCOUNT_ID>` with your account ID (e.g., `123456789012`) — this appears **twice** in the file
 
 **Save the file as `restrict-policy.json`** in your `workshop-lab-6a` folder.
 
-> **⚠️ Common mistakes:** Make sure you replaced ALL instances of `BUCKET_NAME_HERE` (1 place) and `ACCOUNT_ID_HERE` (2 places). The account ID must be exactly 12 digits with no dashes.
+> **⚠️ Common mistakes:** Make sure you replaced ALL instances of `<BUCKET_NAME>` (1 place) and `<ACCOUNT_ID>` (2 places). The account ID must be exactly 12 digits with no dashes.
 
 > **What does this policy do?** Let's break it down:
 >
@@ -563,15 +563,15 @@ aws s3api put-bucket-policy --bucket $BUCKET --policy file://restrict-policy.jso
 **Windows (PowerShell):**
 ```powershell
 aws lambda invoke --function-name workshop-hr-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 hr-response2.json
-Write-Output "=== HR TEAM (AFTER POLICY) ==="
-(Get-Content hr-response2.json | ConvertFrom-Json).statusCode
+
+Write-Output "=== HR TEAM (AFTER POLICY) ===" (Get-Content hr-response2.json | ConvertFrom-Json).statusCode
 ```
 
 **macOS / Linux:**
 ```bash
 aws lambda invoke --function-name workshop-hr-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 hr-response2.json
-echo "=== HR TEAM (AFTER POLICY) ==="
-cat hr-response2.json
+
+echo "=== HR TEAM (AFTER POLICY) ===" cat hr-response2.json
 ```
 
 **✅ You should see:** `200` — ACCESS GRANTED. The HR team can still read the file because they are in the exception list.
@@ -583,15 +583,15 @@ cat hr-response2.json
 **Windows (PowerShell):**
 ```powershell
 aws lambda invoke --function-name workshop-analytics-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 analytics-response2.json
-Write-Output "=== ANALYTICS TEAM (AFTER POLICY) ==="
-(Get-Content analytics-response2.json | ConvertFrom-Json).body
+
+Write-Output "=== ANALYTICS TEAM (AFTER POLICY) ===" (Get-Content analytics-response2.json | ConvertFrom-Json).body
 ```
 
 **macOS / Linux:**
 ```bash
 aws lambda invoke --function-name workshop-analytics-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 analytics-response2.json
-echo "=== ANALYTICS TEAM (AFTER POLICY) ==="
-cat analytics-response2.json
+
+echo "=== ANALYTICS TEAM (AFTER POLICY) ===" cat analytics-response2.json
 ```
 
 **✅ You should see:**
