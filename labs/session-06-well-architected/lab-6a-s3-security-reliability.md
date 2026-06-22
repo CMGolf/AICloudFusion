@@ -33,7 +33,7 @@ The key idea of this lab is the **feedback loop**: for each problem, you will fi
 
 | Service | What It Is | Cost |
 |---------|-----------|------|
-| Amazon S3 | Cloud storage | Free within 5 GB / 2,000 PUT / 20,000 GET per month (12-month free tier) |
+| Amazon S3 | Cloud storage | $0.023 per GB/month, $0.0005 per 1,000 PUT/GET requests |
 | AWS Lambda | Serverless compute | Always Free: 1M requests + 400,000 GB-seconds/month |
 | AWS IAM | Identity and access management | Always Free |
 
