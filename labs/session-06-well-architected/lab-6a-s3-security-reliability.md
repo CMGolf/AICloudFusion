@@ -1,4 +1,4 @@
-# Lab 6A: Architecting S3 for Security & Reliability
+ls# Lab 6A: Architecting S3 for Security & Reliability
 
 **Session:** 6 — AWS Well-Architected Framework  
 **Track:** Solutions Architecture  
