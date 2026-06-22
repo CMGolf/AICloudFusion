@@ -436,8 +436,8 @@ Write-Output "=== HR TEAM RESULT ===" (Get-Content hr-response.json | ConvertFro
 **macOS / Linux:**
 ```bash
 aws lambda invoke --function-name workshop-hr-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 hr-response.json
-echo "=== HR TEAM RESULT ==="
-cat hr-response.json
+
+echo "=== HR TEAM RESULT ===" cat hr-response.json
 ```
 
 **✅ You should see:**
@@ -459,15 +459,15 @@ Good — the HR team SHOULD be able to read this. ✅
 **Windows (PowerShell):**
 ```powershell
 aws lambda invoke --function-name workshop-analytics-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 analytics-response.json
-Write-Output "=== ANALYTICS TEAM RESULT ==="
-(Get-Content analytics-response.json | ConvertFrom-Json).body
+
+Write-Output "=== ANALYTICS TEAM RESULT ===" (Get-Content analytics-response.json | ConvertFrom-Json).body
 ```
 
 **macOS / Linux:**
 ```bash
 aws lambda invoke --function-name workshop-analytics-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 analytics-response.json
-echo "=== ANALYTICS TEAM RESULT ==="
-cat analytics-response.json
+
+echo "=== ANALYTICS TEAM RESULT ===" cat analytics-response.json
 ```
 
 **✅ You should see:**
