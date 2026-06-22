@@ -429,8 +429,8 @@ For example, if your bucket is `jane-doe-waf-lab6a`:
 **Windows (PowerShell):**
 ```powershell
 aws lambda invoke --function-name workshop-hr-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 hr-response.json
-Write-Output "=== HR TEAM RESULT ==="
-(Get-Content hr-response.json | ConvertFrom-Json).body
+
+Write-Output "=== HR TEAM RESULT ===" (Get-Content hr-response.json | ConvertFrom-Json).body
 ```
 
 **macOS / Linux:**
