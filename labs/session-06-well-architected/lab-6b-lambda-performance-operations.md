@@ -162,9 +162,12 @@ aws iam create-role --role-name workshop-waf-lambda-role --assume-role-policy-do
 aws iam attach-role-policy --role-name workshop-waf-lambda-role --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 ```
 
-**✅ JSON output with RoleARN on first command and no output on the second command means success.**
+**✅ JSON output with RoleARN on first command, and no output on the second command means success.**
 
 **⏳ Wait 10 seconds** for the role to propagate.
+
+>[!NOTE]
+>The `AWSLambdaBasicExecutionRole` policy will allow the Role to automatically create a CloudWatch log group when the Lambda is invoked. We need to note this for the cleanup stage.
 
 ---
 
@@ -663,7 +666,23 @@ aws lambda delete-function --function-name workshop-waf-workload --region us-eas
 
 **✅ JSON output with "StatusCode": 204 means success.**
 
-### Step 4: Delete the IAM Role
+### Step 4: Delete the CloudWatch log group
+
+Check what log groups exist:
+```
+aws logs describe-log-groups --region us-east-1
+```
+>[!TIP]
+>To check creation time, convert the `creationTime` value into a human‑readable format with
+>`(Get-Date "1970-01-01").AddMilliseconds(<CREATIONTIME>)`.  
+> The output defaults to UTC, so remember AST is UTC‑4 (e.g., 8 PM UTC equals 4 PM AST).
+
+Delete log group:
+```
+aws logs delete-log-group --log-group-name /aws/lambda/workshop-waf-workload --region us-east-1
+```
+
+### Step 5: Delete the IAM Role
 
 📋 Copy and paste these two commands:
 
@@ -677,7 +696,7 @@ aws iam delete-role --role-name workshop-waf-lambda-role
 
 **✅ No output means success for each.**
 
-### Step 5: Delete Local Files
+### Step 6: Delete Local Files
 
 **Windows (PowerShell):**
 ```powershell
