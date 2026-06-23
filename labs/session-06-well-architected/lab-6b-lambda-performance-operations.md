@@ -289,16 +289,12 @@ First, create the test payload file. **Step 6a:** Open your text editor and crea
 
 **Windows (PowerShell):**
 ```powershell
-aws lambda invoke --function-name workshop-waf-workload --payload file://workload-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 response.json
-
-Write-Output "=== RESULT (128 MB Memory) ===" (Get-Content response.json | ConvertFrom-Json).body
+aws lambda invoke --function-name workshop-waf-workload --payload file://workload-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 response.json; Write-Output "=== RESULT (128 MB Memory) ===" (Get-Content response.json | ConvertFrom-Json).body
 ```
 
 **macOS / Linux:**
 ```bash
-aws lambda invoke --function-name workshop-waf-workload --payload file://workload-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 response.json
-
-echo "=== RESULT (128 MB Memory) ==="cat response.json
+aws lambda invoke --function-name workshop-waf-workload --payload file://workload-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 response.json; echo "=== RESULT (128 MB Memory) ==="cat response.json
 ```
 
 **✅ You should see something like:**
@@ -349,16 +345,12 @@ aws lambda update-function-configuration --function-name workshop-waf-workload -
 
 **Windows (PowerShell):**
 ```powershell
-aws lambda invoke --function-name workshop-waf-workload --payload file://workload-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 response.json
-
-Write-Output "=== RESULT (256 MB Memory) ===" (Get-Content response.json | ConvertFrom-Json).body
+aws lambda invoke --function-name workshop-waf-workload --payload file://workload-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 response.json; Write-Output "=== RESULT (256 MB Memory) ===" (Get-Content response.json | ConvertFrom-Json).body
 ```
 
 **macOS / Linux:**
 ```bash
-aws lambda invoke --function-name workshop-waf-workload --payload file://workload-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 response.json
-
-echo "=== RESULT (256 MB Memory) ===" cat response.json
+aws lambda invoke --function-name workshop-waf-workload --payload file://workload-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 response.json; echo "=== RESULT (256 MB Memory) ===" cat response.json
 ```
 
 **✅ You should see something like:**
@@ -418,16 +410,12 @@ Open your text editor and create a **new file**. 📋 Copy and paste:
 
 **Windows (PowerShell):**
 ```powershell
-aws lambda invoke --function-name workshop-waf-workload --payload file://crash-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 crash-response.json
-
-Write-Output "=== CRASH RESULT ===" (Get-Content crash-response.json)
+aws lambda invoke --function-name workshop-waf-workload --payload file://crash-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 crash-response.json; Write-Output "=== CRASH RESULT ===" (Get-Content crash-response.json)
 ```
 
 **macOS / Linux:**
 ```bash
-aws lambda invoke --function-name workshop-waf-workload --payload file://crash-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 crash-response.json
-
-echo "=== CRASH RESULT ===" cat crash-response.json
+aws lambda invoke --function-name workshop-waf-workload --payload file://crash-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 crash-response.json; echo "=== CRASH RESULT ===" cat crash-response.json
 ```
 
 **✅ You should see:**
