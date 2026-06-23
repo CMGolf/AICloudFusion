@@ -973,15 +973,27 @@ The SAA exam tests:
 
 📋 Copy and paste:
 
+Check to see what dashboards are active:
+```
+aws cloudwatch list-dashboards --region us-east-1
+```
+Delete the relevant dashboard:
+
 ```
 aws cloudwatch delete-dashboards --dashboard-names Workshop-WAF-CostOptimization --region us-east-1
 ```
 
-**✅ No output means success.**
+**✅ No output means success, but you can always verify using the list dashboards command**
 
 ### Step 2: Delete the Lambda Functions
 
-📋 Copy and paste these two commands:
+📋 Copy and paste these commands:
+
+List which Lambdas are active:
+```
+aws lambda list-functions --region us-east-1
+```
+Delete the relevant Lambdas:
 
 ```
 aws lambda delete-function --function-name workshop-waf-cost-calculator --region us-east-1
@@ -991,11 +1003,17 @@ aws lambda delete-function --function-name workshop-waf-cost-calculator --region
 aws lambda delete-function --function-name workshop-waf-cost-workload --region us-east-1
 ```
 
-**✅ No output means success for each.**
+**✅ Output with StatusCode: 204 means success for each.**
 
 ### Step 3: Delete the Log Groups
 
-📋 Copy and paste these two commands:
+📋 Copy and paste these commands:
+
+Check to see what Log Groups are active:
+```
+aws logs describe-log-groups --region us-east-1
+```
+Delete the relevant Log Groups:
 
 ```
 aws logs delete-log-group --log-group-name /aws/lambda/workshop-waf-cost-workload --region us-east-1
@@ -1005,7 +1023,7 @@ aws logs delete-log-group --log-group-name /aws/lambda/workshop-waf-cost-workloa
 aws logs delete-log-group --log-group-name /aws/lambda/workshop-waf-cost-calculator --region us-east-1
 ```
 
-**✅ No output means success for each.**
+**✅ No output means success for each, but you can verify by using the list log groups command.**
 
 ### Step 4: Delete the IAM Role
 
