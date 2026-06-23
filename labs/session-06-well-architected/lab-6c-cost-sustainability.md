@@ -296,16 +296,12 @@ aws lambda create-function \
 
 **Windows (PowerShell):**
 ```powershell
-aws lambda invoke --function-name workshop-waf-cost-workload --payload file://workload-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 response.json
-Write-Output "=== WORKLOAD RESULT ==="
-(Get-Content response.json | ConvertFrom-Json).body
+aws lambda invoke --function-name workshop-waf-cost-workload --payload file://workload-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 response.json; Write-Output "=== WORKLOAD RESULT ===" (Get-Content response.json | ConvertFrom-Json).body
 ```
 
 **macOS / Linux:**
 ```bash
-aws lambda invoke --function-name workshop-waf-cost-workload --payload file://workload-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 response.json
-echo "=== WORKLOAD RESULT ==="
-cat response.json
+aws lambda invoke --function-name workshop-waf-cost-workload --payload file://workload-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 response.json; echo "=== WORKLOAD RESULT ===" cat response.json
 ```
 
 **✅ You should see something like:**
@@ -618,16 +614,12 @@ For example, if your duration was 363 ms, the file would contain:
 
 **Windows (PowerShell):**
 ```powershell
-aws lambda invoke --function-name workshop-waf-cost-calculator --payload file://calculator-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 calc-response.json
-Write-Output "=== COST PROJECTION (BEFORE) ==="
-(Get-Content calc-response.json | ConvertFrom-Json).body
+aws lambda invoke --function-name workshop-waf-cost-calculator --payload file://calculator-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 calc-response.json; Write-Output "=== COST PROJECTION (BEFORE) ===" (Get-Content calc-response.json | ConvertFrom-Json).body
 ```
 
 **macOS / Linux:**
 ```bash
-aws lambda invoke --function-name workshop-waf-cost-calculator --payload file://calculator-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 calc-response.json
-echo "=== COST PROJECTION (BEFORE) ==="
-cat calc-response.json
+aws lambda invoke --function-name workshop-waf-cost-calculator --payload file://calculator-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 calc-response.json; echo "=== COST PROJECTION (BEFORE) ===" cat calc-response.json
 ```
 
 **✅ You should see something like:**
@@ -710,16 +702,12 @@ aws lambda update-function-code \
 
 **Windows (PowerShell):**
 ```powershell
-aws lambda invoke --function-name workshop-waf-cost-workload --payload file://workload-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 response-arm64.json
-Write-Output "=== WORKLOAD RESULT (arm64 Graviton) ==="
-(Get-Content response-arm64.json | ConvertFrom-Json).body
+aws lambda invoke --function-name workshop-waf-cost-workload --payload file://workload-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 response-arm64.json; Write-Output "=== WORKLOAD RESULT (arm64 Graviton) ===" (Get-Content response-arm64.json | ConvertFrom-Json).body
 ```
 
 **macOS / Linux:**
 ```bash
-aws lambda invoke --function-name workshop-waf-cost-workload --payload file://workload-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 response-arm64.json
-echo "=== WORKLOAD RESULT (arm64 Graviton) ==="
-cat response-arm64.json
+aws lambda invoke --function-name workshop-waf-cost-workload --payload file://workload-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 response-arm64.json; echo "=== WORKLOAD RESULT (arm64 Graviton) ===" cat response-arm64.json
 ```
 
 **✅ You should see something like:**
@@ -754,16 +742,12 @@ Now update your calculator payload with the new duration and re-run it.
 
 **Windows (PowerShell):**
 ```powershell
-aws lambda invoke --function-name workshop-waf-cost-calculator --payload file://calculator-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 calc-response2.json
-Write-Output "=== COST PROJECTION (AFTER GRAVITON) ==="
-(Get-Content calc-response2.json | ConvertFrom-Json).body
+aws lambda invoke --function-name workshop-waf-cost-calculator --payload file://calculator-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 calc-response2.json; Write-Output "=== COST PROJECTION (AFTER GRAVITON) ===" (Get-Content calc-response2.json | ConvertFrom-Json).body
 ```
 
 **macOS / Linux:**
 ```bash
-aws lambda invoke --function-name workshop-waf-cost-calculator --payload file://calculator-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 calc-response2.json
-echo "=== COST PROJECTION (AFTER GRAVITON) ==="
-cat calc-response2.json
+aws lambda invoke --function-name workshop-waf-cost-calculator --payload file://calculator-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 calc-response2.json; echo "=== COST PROJECTION (AFTER GRAVITON) ===" cat calc-response2.json
 ```
 
 **✅ You should see the compute cost drop significantly:**
@@ -872,16 +856,12 @@ aws logs describe-log-groups --log-group-name-prefix "/aws/lambda/workshop-waf-c
 
 **Windows (PowerShell):**
 ```powershell
-aws lambda invoke --function-name workshop-waf-cost-calculator --payload file://calculator-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 calc-response3.json
-Write-Output "=== COST PROJECTION (AFTER RETENTION FIX) ==="
-(Get-Content calc-response3.json | ConvertFrom-Json).body
+aws lambda invoke --function-name workshop-waf-cost-calculator --payload file://calculator-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 calc-response3.json; Write-Output "=== COST PROJECTION (AFTER RETENTION FIX) ===" (Get-Content calc-response3.json | ConvertFrom-Json).body
 ```
 
 **macOS / Linux:**
 ```bash
-aws lambda invoke --function-name workshop-waf-cost-calculator --payload file://calculator-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 calc-response3.json
-echo "=== COST PROJECTION (AFTER RETENTION FIX) ==="
-cat calc-response3.json
+aws lambda invoke --function-name workshop-waf-cost-calculator --payload file://calculator-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 calc-response3.json; echo "=== COST PROJECTION (AFTER RETENTION FIX) ===" cat calc-response3.json
 ```
 
 **✅ You should see the logs cost drop dramatically:**
