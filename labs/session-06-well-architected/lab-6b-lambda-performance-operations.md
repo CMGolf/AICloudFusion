@@ -637,7 +637,25 @@ aws cloudwatch delete-alarms --alarm-names workshop-lambda-errors --region us-ea
 
 **✅ No output means success.**
 
-### Step 2: Delete the SNS Topic
+### Step 2: Unsubscribe and Delete the SNS Topic
+
+Check for active subscriptions:
+
+```
+aws sns list-subscriptions --region us-east-1
+```
+
+Unsubscribe from the topic linked to the current workshop:
+
+```
+aws sns unsubscribe --subscription-arn <SUBSCRIPTION_ARN> --region us-east-1
+```
+
+Command to list topics:
+
+```
+aws sns list-topics --region us-east-1
+```
 
 📋 Copy and paste, **replacing `<TOPIC_ARN>`**:
 
@@ -655,7 +673,7 @@ aws sns delete-topic --topic-arn <TOPIC_ARN> --region us-east-1
 aws lambda delete-function --function-name workshop-waf-workload --region us-east-1
 ```
 
-**✅ No output means success.**
+**✅ JSON output with "StatusCode": 204 means success.**
 
 ### Step 4: Delete the IAM Role
 
