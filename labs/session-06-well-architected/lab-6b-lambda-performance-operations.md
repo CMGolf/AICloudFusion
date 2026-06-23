@@ -162,7 +162,7 @@ aws iam create-role --role-name workshop-waf-lambda-role --assume-role-policy-do
 aws iam attach-role-policy --role-name workshop-waf-lambda-role --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 ```
 
-**✅ No output on the second command means success.**
+**✅ JSON output with RoleARN on first command and no output on the second command means success.**
 
 **⏳ Wait 10 seconds** for the role to propagate.
 
