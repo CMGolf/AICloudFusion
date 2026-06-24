@@ -86,6 +86,7 @@ Commands are inside gray code boxes. **📋 Copy and paste** them into your term
 | `<LAMBDA_ARN>` | The ARN of your Lambda function (Step 8) | `arn:aws:lambda:us-east-1:123456789012:function:workshop-key-revoker` |
 | `<RULE_ARN>` | The ARN of your EventBridge rule (Step 11) | `arn:aws:events:us-east-1:123456789012:rule/workshop-auto-revoke` |
 | `<TEST_KEY_ID>` | The Access Key ID of the test user (Step 9) | `AKIAIOSFODNN7EXAMPLE` |
+| `<STUDENT>` | Unique name for your S3 bucket | `student-cloudtrail-bucket` |
 
 ---
 
@@ -787,7 +788,7 @@ aws cloudtrail describe-trails --region us-east-1
 
 If you see `"trailList": []` the deletion is confirmed.
 
-### Cleanup Step 7: Empty and Delete the S3 Bucket (replace `<ACCOUNT_ID>`)
+### Cleanup Step 7: Empty and Delete the S3 Bucket (replace `<STUDENT>`)
 
 ```
 aws s3 rm s3://<STUDENT>-workshop-cloudtrail --recursive
