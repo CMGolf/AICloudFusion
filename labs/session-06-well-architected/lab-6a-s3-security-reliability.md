@@ -428,16 +428,12 @@ For example, if your bucket is `jane-doe-waf-lab6a`:
 
 **Windows (PowerShell):**
 ```powershell
-aws lambda invoke --function-name workshop-hr-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 hr-response.json
-
-Write-Output "=== HR TEAM RESULT ===" (Get-Content hr-response.json | ConvertFrom-Json).body
+aws lambda invoke --function-name workshop-hr-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 hr-response.json; Write-Output "=== HR TEAM RESULT ===" (Get-Content hr-response.json | ConvertFrom-Json).body
 ```
 
 **macOS / Linux:**
 ```bash
-aws lambda invoke --function-name workshop-hr-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 hr-response.json
-
-echo "=== HR TEAM RESULT ===" cat hr-response.json
+aws lambda invoke --function-name workshop-hr-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 hr-response.json; echo "=== HR TEAM RESULT ===" cat hr-response.json
 ```
 
 **✅ You should see:**
@@ -458,16 +454,12 @@ Good — the HR team SHOULD be able to read this. ✅
 
 **Windows (PowerShell):**
 ```powershell
-aws lambda invoke --function-name workshop-analytics-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 analytics-response.json
-
-Write-Output "=== ANALYTICS TEAM RESULT ===" (Get-Content analytics-response.json | ConvertFrom-Json).body
+aws lambda invoke --function-name workshop-analytics-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 analytics-response.json; Write-Output "=== ANALYTICS TEAM RESULT ===" (Get-Content analytics-response.json | ConvertFrom-Json).body
 ```
 
 **macOS / Linux:**
 ```bash
-aws lambda invoke --function-name workshop-analytics-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 analytics-response.json
-
-echo "=== ANALYTICS TEAM RESULT ===" cat analytics-response.json
+aws lambda invoke --function-name workshop-analytics-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 analytics-response.json; echo "=== ANALYTICS TEAM RESULT ===" cat analytics-response.json
 ```
 
 **✅ You should see:**
@@ -562,16 +554,12 @@ aws s3api put-bucket-policy --bucket $BUCKET --policy file://restrict-policy.jso
 
 **Windows (PowerShell):**
 ```powershell
-aws lambda invoke --function-name workshop-hr-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 hr-response2.json
-
-Write-Output "=== HR TEAM (AFTER POLICY) ===" (Get-Content hr-response2.json | ConvertFrom-Json).statusCode
+aws lambda invoke --function-name workshop-hr-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 hr-response2.json; Write-Output "=== HR TEAM (AFTER POLICY) ===" (Get-Content hr-response2.json | ConvertFrom-Json).statusCode
 ```
 
 **macOS / Linux:**
 ```bash
-aws lambda invoke --function-name workshop-hr-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 hr-response2.json
-
-echo "=== HR TEAM (AFTER POLICY) ===" cat hr-response2.json
+aws lambda invoke --function-name workshop-hr-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 hr-response2.json; echo "=== HR TEAM (AFTER POLICY) ===" cat hr-response2.json
 ```
 
 **✅ You should see:** `200` — ACCESS GRANTED. The HR team can still read the file because they are in the exception list.
@@ -582,16 +570,12 @@ echo "=== HR TEAM (AFTER POLICY) ===" cat hr-response2.json
 
 **Windows (PowerShell):**
 ```powershell
-aws lambda invoke --function-name workshop-analytics-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 analytics-response2.json
-
-Write-Output "=== ANALYTICS TEAM (AFTER POLICY) ===" (Get-Content analytics-response2.json | ConvertFrom-Json).body
+aws lambda invoke --function-name workshop-analytics-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 analytics-response2.json; Write-Output "=== ANALYTICS TEAM (AFTER POLICY) ===" (Get-Content analytics-response2.json | ConvertFrom-Json).body
 ```
 
 **macOS / Linux:**
 ```bash
-aws lambda invoke --function-name workshop-analytics-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 analytics-response2.json
-
-echo "=== ANALYTICS TEAM (AFTER POLICY) ===" cat analytics-response2.json
+aws lambda invoke --function-name workshop-analytics-reader --payload file://read-payload.json --cli-binary-format raw-in-base64-out --region us-east-1 analytics-response2.json; echo "=== ANALYTICS TEAM (AFTER POLICY) ===" cat analytics-response2.json
 ```
 
 **✅ You should see:**
@@ -888,7 +872,7 @@ aws lambda delete-function --function-name workshop-hr-reader --region us-east-1
 aws lambda delete-function --function-name workshop-analytics-reader --region us-east-1
 ```
 
-**✅ No output means success for each.**
+**✅ Output with StatusCode: 204 means success for each.**
 
 ### Step 2: Delete the Lambda Log Groups
 
