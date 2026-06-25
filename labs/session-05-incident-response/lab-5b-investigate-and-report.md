@@ -622,7 +622,7 @@ This is the primary investigation step. CloudWatch Logs Insights queries the tra
 
 1. Go to [https://console.aws.amazon.com/](https://console.aws.amazon.com/)
 2. Search for **CloudWatch** in the top search bar and click it
-3. In the left sidebar, under **Logs**, click **Logs Insights**
+3. In the left sidebar, under **Logs**, click **Log Management** and you can continue to **Logs Insights**
 
 **Step 8b: Select the log group**
 
