@@ -1041,7 +1041,7 @@ You set up a **complete Infrastructure as Code foundation** — the same setup a
 - **Environments share code** — dev, staging, and prod use the same modules with different variables. Change once, deploy consistently.
 - **Destroy is one command** — no more manual cleanup with 15 delete commands. OpenTofu tracks everything.
 
-> **💡 What persists after this lab:** The state bucket, lock table, IAM role, and your repo scaffolding all stay in place. Labs 7B and 7C will deploy real resources into this same structure. Do NOT delete these bootstrap resources.
+> **💡 What persists after this lab:** Your local `workshop-iac` folder (now a Git repo), the state bucket, lock table, and IAM role all stay in place. Labs 7B and 7C will deploy real resources into this same structure. **Do NOT delete the `workshop-iac` folder or these AWS bootstrap resources** — you will keep building on them.
 
 ---
 
@@ -1082,16 +1082,18 @@ The SAA exam tests:
 
 ## Cleanup
 
-> **⚠️ IMPORTANT: Do NOT delete the state bucket, DynamoDB table, or IAM role!** These are used in Labs 7B and 7C. Only clean up if you are NOT continuing with the rest of Session 7.
+> **⚠️ IMPORTANT: Do NOT delete the `workshop-iac` folder, the state bucket, the DynamoDB table, or the IAM role!** This folder is your Git repository and the home of all your IaC code — **Labs 7B, 7C, and Session 8 all build directly on it.** If you delete it, you will have to redo this entire lab. Only clean up if you are NOT continuing the IaC track.
 
 ### If you ARE continuing to Lab 7B/7C (recommended):
 
 **No cleanup needed.** Keep everything in place:
+- ✅ **Your local project folder / Git repo stays** (`~/Desktop/workshop-iac`) — this is your code; do not delete it
 - ✅ State bucket stays (`workshop-tofu-state-<YOUR_ACCOUNT_ID>`)
 - ✅ Lock table stays (`terraform-locks`)
 - ✅ Deploy role stays (`workshop-tofu-deploy-role`)
-- ✅ Your repo scaffolding stays (`workshop-iac/`)
 - The test S3 bucket was already destroyed in Step 15
+
+> **💡 Between now and your next lab:** leave the `workshop-iac` folder on your Desktop exactly where it is. When you start Lab 7B, you will open this same folder in VS Code and continue building in it. Your Git history and commit from Step 18 will still be there.
 
 ### If you are DONE with Session 7 and want to clean up everything:
 
