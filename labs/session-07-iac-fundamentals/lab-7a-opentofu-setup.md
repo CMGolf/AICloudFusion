@@ -3,7 +3,7 @@
 **Session:** 7 — Infrastructure as Code with OpenTofu  
 **Track:** Solutions Architecture  
 **Difficulty:** Beginner  
-**Estimated Time:** 40–45 minutes  
+**Estimated Time:** 45–55 minutes  
 **Target Cert:** AWS Solutions Architect – Associate (SAA)
 
 ---
@@ -17,6 +17,7 @@ In this lab, you will set up a **complete Infrastructure as Code (IaC) environme
 3. **A dedicated IAM role** — a separate identity that OpenTofu uses to create resources (not your admin credentials)
 4. **A professional repo structure** — environments (dev/staging/prod), modules, scripts, and policies folders
 5. **A working `tofu init → plan → apply → destroy` cycle** — proof that everything connects
+6. **A Git repository** — your whole project under version control, ready to share
 
 **The scenario:** You are a new Solutions Architect starting at a company. Before you can deploy any infrastructure, you need to set up the tooling and repo structure that your team will use for all future deployments. This is the real first task of any IaC project — and you are going to do it properly from day one.
 
@@ -28,7 +29,8 @@ In this lab, you will set up a **complete Infrastructure as Code (IaC) environme
 
 - ✅ Completed **Lab 1A** (AWS CLI installed and configured)
 - ✅ AWS CLI authenticated — run `aws sts get-caller-identity` and confirm it returns your account info
-- ✅ A text editor for creating files
+- ✅ **VS Code** installed (strongly recommended for this lab — it makes creating files painless). Download free from [code.visualstudio.com](https://code.visualstudio.com/) if you don't have it.
+- ✅ **Git** installed — run `git --version` in your terminal. If you see a version number, you're set. If not, download from [git-scm.com](https://git-scm.com/downloads) (accept the default options during install).
 
 ---
 
@@ -197,6 +199,8 @@ curl -Lo /tmp/tofu.zip "https://github.com/opentofu/opentofu/releases/download/v
 sudo unzip -o /tmp/tofu.zip -d /usr/local/bin/ tofu
 ```
 
+> **💡 Mac users:** Use the **Homebrew** method above if you can — it automatically picks the right build for your Mac (Intel or Apple Silicon). The manual command above is for Intel Macs; on Apple Silicon (M1/M2/M3), replace `amd64` with `arm64`.
+
 **Verify installation:**
 
 📋 Copy and paste:
@@ -354,6 +358,8 @@ In VS Code's Explorer panel, **right-click the `workshop-iac` folder** (the top-
 
 ### Step 7: Create the Role
 
+> **💡 Before running this command:** It reads the `tofu-trust-policy.json` file you just created, so your terminal must be in the `workshop-iac` folder (where you saved it). Your terminal should already be there from Step 3 — run `pwd` to confirm the path ends in `workshop-iac`. If not, run `cd ~\Desktop\workshop-iac` (Windows) or `cd ~/Desktop/workshop-iac` (Mac/Linux) first.
+
 📋 Copy and paste:
 
 ```
@@ -486,7 +492,7 @@ workshop-iac/
 
 ### Step 10: Create the Dev Environment Configuration
 
-You will now create four files in the `infra/environments/dev/` folder. These are the core of any OpenTofu environment.
+You will now create five files in the `infra/environments/dev/` folder. These are the core of any OpenTofu environment.
 
 **Step 10a: Create `backend.tf`** — tells OpenTofu where to store its state
 
@@ -672,7 +678,7 @@ infra/environments/dev/
 
 ### Step 11: Create a `.gitignore`
 
-In a real project, this repo would be version-controlled with Git. The `.gitignore` file tells Git which files to NOT track (local state, temporary files, sensitive data).
+In a real project, this repo is version-controlled with Git (you will turn this folder into a real Git repository in **Step 17**). The `.gitignore` file tells Git which files to NOT track (local state, temporary files, sensitive data). You create it now so it is ready before you initialize Git.
 
 **Right-click the top-level `workshop-iac` folder** → **New File** → name it exactly `.gitignore` → press Enter.
 
@@ -910,6 +916,110 @@ provider "aws" {
 
 ---
 
+## PART 5 — Put Your Project Under Version Control
+
+Right now `workshop-iac` is just a folder on your computer. To make it a real, professional IaC project, you will turn it into a **Git repository** and save a snapshot (a "commit") of your work. This is what makes your infrastructure shareable, reviewable, and recoverable.
+
+### Step 17: Initialize the Git Repository
+
+**Step 17a: Make sure your terminal is in the project root.**
+
+📋 Copy and paste:
+
+**Windows (PowerShell):**
+```powershell
+cd ~\Desktop\workshop-iac
+```
+
+**macOS / Linux:**
+```bash
+cd ~/Desktop/workshop-iac
+```
+
+> **💡 Note:** Earlier you were inside `infra/environments/dev` to run OpenTofu. For Git, you go back up to the top of the project (`workshop-iac`), because the whole project is one repository.
+
+**Step 17b: Initialize Git.**
+
+📋 Copy and paste:
+
+```
+git init
+```
+
+**✅ You should see:** `Initialized empty Git repository in .../workshop-iac/.git/`
+
+> **What does this do?** It creates a hidden `.git` folder that tracks every change to your project. Your folder is now a Git repository.
+
+**Step 17c: Tell Git who you are** (only needed once per computer). 📋 Copy and paste, **replacing the name and email with your own**:
+
+```
+git config user.name "Your Name"
+```
+
+```
+git config user.email "you@example.com"
+```
+
+**✅ No output means success.**
+
+> **💡 Why?** Every commit is stamped with an author. Git needs to know your name and email to record who made each change.
+
+---
+
+### Step 18: Make Your First Commit
+
+A "commit" is a saved snapshot of your project at a point in time.
+
+**Step 18a: See what Git is about to track.**
+
+📋 Copy and paste:
+
+```
+git status
+```
+
+**✅ You should see** a list of files in green or under "Untracked files" — your `infra/` folder, the policy JSON files, and `.gitignore`. 
+
+> **💡 Notice what is NOT listed:** the `.terraform/` folder and any `.tfstate` files. Your `.gitignore` is doing its job — those are deliberately excluded because state lives safely in S3, not in Git.
+
+**Step 18b: Stage all files** (mark them to be committed).
+
+📋 Copy and paste:
+
+```
+git add .
+```
+
+(That is `git add` followed by a space and a period. The period means "everything in this folder.")
+
+**✅ No output means success.**
+
+**Step 18c: Create the commit.**
+
+📋 Copy and paste:
+
+```
+git commit -m "Initial IaC foundation: backend, deploy role, dev environment"
+```
+
+**✅ You should see** a summary like `X files changed, Y insertions(+)` with your commit message.
+
+**Step 18d: Confirm the commit was saved.**
+
+📋 Copy and paste:
+
+```
+git log --oneline
+```
+
+**✅ You should see** one line with a short code and your commit message.
+
+> **🎉 Your IaC foundation is now version-controlled!** Everything needed to recreate your infrastructure — the backend config, the deploy role, the environment structure — is saved in Git history. In a real job, you would now push this to GitHub so your team can review and collaborate.
+
+> **💡 Coming in Session 8:** You will connect this repository to GitHub and build a CI/CD pipeline that automatically runs `tofu plan` and `tofu apply` whenever you push changes — no manual commands needed.
+
+---
+
 ## What You Just Did
 
 You set up a **complete Infrastructure as Code foundation** — the same setup a real engineering team uses before deploying their first line of infrastructure:
@@ -921,6 +1031,7 @@ You set up a **complete Infrastructure as Code foundation** — the same setup a
 | DynamoDB lock table | Prevents two people from modifying infrastructure at the same time |
 | Dedicated deploy IAM role | Separation of duties — OpenTofu has limited, auditable permissions |
 | Professional repo structure | Dev/staging/prod environments, modules, scripts — ready to scale |
+| Git repository with first commit | Your infrastructure is version-controlled, shareable, and recoverable |
 | Working init → plan → apply → destroy cycle | The core IaC workflow, proven end to end |
 
 **Key takeaways:**
@@ -963,6 +1074,9 @@ The SAA exam tests:
 | `Error creating S3 Bucket: AccessDenied` | The deploy role's permissions don't cover the bucket name | Verify `tofu-permissions.json` has `"Resource": ["arn:aws:s3:::workshop-*", ...]` and your bucket name starts with `workshop-` |
 | `BucketAlreadyExists` when creating the state bucket | Someone else has that name | Add extra characters to the bucket name (e.g., append `-01`) and update `backend.tf` to match |
 | Plan shows no changes but you expected a resource | The resource code may not be saved | Make sure `main.tf` is saved, and you're in the right directory (`infra/environments/dev/`) |
+| `git: command not found` or not recognized | Git is not installed | Install Git from [git-scm.com](https://git-scm.com/downloads), then close and reopen your terminal |
+| `Author identity unknown` when committing | Git doesn't know your name/email yet | Run the two `git config` commands from Step 17c, then commit again |
+| `git init` says "reinitialized existing repository" | You already ran it — that's fine | No action needed; continue to the commit step |
 
 ---
 
