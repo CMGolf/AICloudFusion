@@ -77,6 +77,41 @@ Commands are inside gray code boxes. **📋 Copy and paste** them into your term
 
 ---
 
+## ⚠️ IMPORTANT: How to Create Files in This Lab (Read This First)
+
+This lab has you create **several text files** inside folders. This is the #1 place beginners get stuck, so read this carefully — it will save you a lot of frustration.
+
+**We strongly recommend using VS Code** (the free code editor). It makes creating files in the right folder simple and shows you the whole folder structure on the left. In **Step 3** you will open your project folder in VS Code, and from then on you will create every file inside it.
+
+### Creating a file in VS Code (the easy way)
+
+1. In the left sidebar (the **Explorer** panel), find the folder the lab tells you to save into
+2. **Right-click that folder** → click **New File**
+3. Type the **exact file name** the lab gives you (for example, `main.tf`) and press Enter
+4. The empty file opens in the editor — paste the content the lab provides
+5. Save with **Ctrl+S** (Windows) or **Cmd+S** (Mac)
+
+That's it — the file is saved in the right place with the right name automatically. No extension problems.
+
+### ⚠️ If you use Notepad instead (Windows)
+
+Notepad has a dangerous habit: it secretly adds `.txt` to your file name. A file you think is `main.tf` becomes `main.tf.txt`, and **OpenTofu will not find it.** If you must use Notepad:
+
+- In the Save dialog, change **"Save as type"** from "Text Documents" to **"All Files"**
+- Put the file name in **double quotes**, like `"main.tf"`, to force the exact name
+- Make sure you save it into the exact folder the lab specifies (navigate to it in the Save dialog)
+
+### File extensions you'll see in this lab
+
+- `.tf` — an OpenTofu configuration file (this is code, not plain text)
+- `.tfvars` — a file holding variable values
+- `.json` — a file holding AWS policy documents
+- `.gitignore` — note there is **no name before the dot** — the whole file name is `.gitignore`
+
+> **💡 Bottom line:** Use VS Code, create files by right-clicking the correct folder, and you will avoid 90% of the problems people hit in this lab.
+
+---
+
 ## Lab Steps
 
 ### Step 1: Set Your AWS Profile
@@ -205,6 +240,20 @@ cd ~/Desktop/workshop-iac
 
 **Verify:** `pwd` should show a path ending in `workshop-iac`.
 
+**Now open this folder in VS Code.** 📋 Copy and paste:
+
+```
+code .
+```
+
+(That is the word `code`, a space, then a period. The period means "the current folder.")
+
+**✅ You should see** VS Code open with `WORKSHOP-IAC` shown in the Explorer panel on the left. This is your project. From now on, when the lab says "create a file," you will right-click the correct folder in this Explorer panel and choose **New File** (see the "How to Create Files" section above).
+
+> **💡 If `code .` does not work:** VS Code may not be on your PATH. You can instead open VS Code manually, then **File → Open Folder** and select the `workshop-iac` folder on your Desktop. Or, if you are not using VS Code, just remember to save every file into this folder (and its subfolders) using the Notepad instructions above.
+
+> **💡 Keep your terminal too.** You will switch between the terminal (to run commands) and VS Code (to create and edit files) throughout this lab. Keep both open side by side.
+
 ---
 
 ## PART 1 — Bootstrap the State Backend
@@ -278,7 +327,9 @@ Instead of running OpenTofu with your full admin credentials, you will create a 
 
 ### Step 6: Create the Trust Policy
 
-Open your text editor and create a **new, empty file**. 📋 Copy and paste this, **replacing `ACCOUNT_ID_HERE`** with your 12-digit account ID:
+In VS Code's Explorer panel, **right-click the `workshop-iac` folder** (the top-level one) → **New File** → name it exactly `tofu-trust-policy.json` → press Enter.
+
+📋 Copy and paste this into the file, **replacing `ACCOUNT_ID_HERE`** with your 12-digit account ID (the one you wrote down in Step 1):
 
 ```json
 {
@@ -295,7 +346,9 @@ Open your text editor and create a **new, empty file**. 📋 Copy and paste this
 }
 ```
 
-**Save the file as `tofu-trust-policy.json`** in your `workshop-iac` folder.
+**Replace `ACCOUNT_ID_HERE` in 1 place**, then **save the file (Ctrl+S / Cmd+S)**.
+
+> **⚠️ Double-check:** The file name is `tofu-trust-policy.json` — not `.json.txt`. In VS Code, look at the file tab at the top; it should say `tofu-trust-policy.json`.
 
 > **What does this file do?** It says "any identity in my AWS account can assume this role." Since you are the only person in your account, this effectively means "I can assume this role." In a team environment, you would restrict this further to specific users or CI/CD roles.
 
@@ -313,7 +366,9 @@ aws iam create-role --role-name workshop-tofu-deploy-role --assume-role-policy-d
 
 The deploy role needs permission to manage the resources OpenTofu will create (S3 buckets in this lab) and to read/write the state lock table.
 
-**Step 8a:** Open your text editor and create a **new, empty file**. 📋 Copy and paste this, **replacing `ACCOUNT_ID_HERE`** with your account ID:
+**Step 8a:** In VS Code's Explorer panel, **right-click the `workshop-iac` folder** → **New File** → name it exactly `tofu-permissions.json` → press Enter.
+
+📋 Copy and paste this into the file, **replacing `ACCOUNT_ID_HERE`** with your account ID:
 
 ```json
 {
@@ -396,6 +451,8 @@ mkdir -p infra/scripts
 mkdir -p infra/policies
 ```
 
+> **💡 After running these commands, look at the VS Code Explorer panel on the left.** You should see the new `infra` folder appear, and you can click the little arrows (▶) to expand it and see the `environments/dev`, `environments/staging`, etc. folders inside. If you do not see them, click the refresh icon at the top of the Explorer panel, or close and reopen the folder.
+
 **Your folder structure now looks like this:**
 
 ```
@@ -433,7 +490,9 @@ You will now create four files in the `infra/environments/dev/` folder. These ar
 
 **Step 10a: Create `backend.tf`** — tells OpenTofu where to store its state
 
-Open your text editor and create a **new, empty file**. 📋 Copy and paste this, **replacing `ACCOUNT_ID_HERE`** with your account ID:
+In VS Code's Explorer, expand `infra` → `environments`, then **right-click the `dev` folder** → **New File** → name it exactly `backend.tf` → press Enter.
+
+📋 Copy and paste this into the file, **replacing `ACCOUNT_ID_HERE`** with your account ID (1 place), then **save (Ctrl+S)**:
 
 ```hcl
 terraform {
@@ -459,7 +518,9 @@ terraform {
 
 **Step 10b: Create `variables.tf`** — declares what inputs this configuration accepts
 
-Open your text editor and create a **new, empty file**. 📋 Copy and paste:
+**Right-click the `dev` folder** again → **New File** → name it exactly `variables.tf` → press Enter.
+
+📋 Copy and paste this into the file, then **save (Ctrl+S)**:
 
 ```hcl
 variable "environment" {
@@ -493,7 +554,9 @@ variable "tofu_role_arn" {
 
 **Step 10c: Create `terraform.tfvars`** — sets the actual values for variables
 
-Open your text editor and create a **new, empty file**. 📋 Copy and paste this, **replacing `ACCOUNT_ID_HERE`** with your account ID:
+**Right-click the `dev` folder** → **New File** → name it exactly `terraform.tfvars` → press Enter.
+
+📋 Copy and paste this into the file, **replacing `ACCOUNT_ID_HERE`** with your account ID (1 place), then **save (Ctrl+S)**:
 
 ```hcl
 environment   = "dev"
@@ -510,7 +573,9 @@ tofu_role_arn = "arn:aws:iam::ACCOUNT_ID_HERE:role/workshop-tofu-deploy-role"
 
 **Step 10d: Create `main.tf`** — the provider configuration and your first resource
 
-Open your text editor and create a **new, empty file**. 📋 Copy and paste:
+**Right-click the `dev` folder** → **New File** → name it exactly `main.tf` → press Enter.
+
+📋 Copy and paste this into the file, then **save (Ctrl+S)**:
 
 ```hcl
 terraform {
@@ -568,7 +633,9 @@ resource "aws_s3_bucket" "test" {
 
 **Step 10e: Create `outputs.tf`** — defines what values to display after `tofu apply`
 
-Open your text editor and create a **new, empty file**. 📋 Copy and paste:
+**Right-click the `dev` folder** → **New File** → name it exactly `outputs.tf` → press Enter.
+
+📋 Copy and paste this into the file, then **save (Ctrl+S)**:
 
 ```hcl
 output "test_bucket_name" {
@@ -607,7 +674,11 @@ infra/environments/dev/
 
 In a real project, this repo would be version-controlled with Git. The `.gitignore` file tells Git which files to NOT track (local state, temporary files, sensitive data).
 
-Open your text editor and create a **new, empty file**. 📋 Copy and paste:
+**Right-click the top-level `workshop-iac` folder** → **New File** → name it exactly `.gitignore` → press Enter.
+
+> **⚠️ Note the name:** It starts with a dot and has **nothing before the dot** — the entire file name is `.gitignore`. This is normal for config files. VS Code handles this fine.
+
+📋 Copy and paste this into the file, then **save (Ctrl+S)**:
 
 ```
 # OpenTofu local files
@@ -639,17 +710,27 @@ Thumbs.db
 
 This is the moment of truth. `tofu init` downloads the AWS provider plugin and connects to your S3 backend.
 
+**First, make sure your terminal is in the `dev` folder.** All OpenTofu commands must be run from the folder that contains your `.tf` files.
+
 📋 Copy and paste:
 
 **Windows (PowerShell):**
 ```powershell
-cd infra\environments\dev
-tofu init
+cd ~\Desktop\workshop-iac\infra\environments\dev
 ```
 
 **macOS / Linux:**
 ```bash
-cd infra/environments/dev
+cd ~/Desktop/workshop-iac/infra/environments/dev
+```
+
+**Verify you are in the right place.** 📋 Copy and paste `pwd` — the path it prints should end in `dev`.
+
+> **💡 If you opened a brand-new terminal**, you also need to set your AWS profile again (it does not carry over between terminals). Run the command from Step 1: `$env:AWS_PROFILE="<YOUR_PROFILE_NAME>"` (Windows) or `export AWS_PROFILE="<YOUR_PROFILE_NAME>"` (Mac/Linux).
+
+**Now initialize.** 📋 Copy and paste:
+
+```
 tofu init
 ```
 
@@ -788,11 +869,11 @@ Destroy complete! Resources: 1 destroyed.
 
 ### Step 16: Remove the Test Resource from Your Code
 
-Since you destroyed the test bucket, remove it from `main.tf` so your code matches reality.
+Since you destroyed the test bucket, you need to remove it from `main.tf` so your code matches reality. Rather than carefully deleting parts (easy to make a mistake), you will **replace the whole file**.
 
-Open `infra/environments/dev/main.tf` in your text editor. **Delete** the last two blocks (the `data "aws_caller_identity"` and `resource "aws_s3_bucket"` blocks).
+**Step 16a:** In VS Code, open `infra/environments/dev/main.tf`. Select everything (**Ctrl+A** / **Cmd+A**) and delete it so the file is empty.
 
-Your `main.tf` should now look like this:
+**Step 16b:** 📋 Copy and paste this complete, clean version, then **save (Ctrl+S)**:
 
 ```hcl
 terraform {
@@ -823,9 +904,7 @@ provider "aws" {
 }
 ```
 
-Also open `outputs.tf` and **delete all content** (or delete the file). You will add real outputs in Lab 7B.
-
-**Save both files.**
+**Step 16c:** Now empty out `outputs.tf` (the test bucket outputs no longer apply). In VS Code, **right-click `outputs.tf`** in the Explorer → **Delete** → confirm. You will create real outputs in Lab 7B.
 
 > **💡 This is the IaC discipline:** code and infrastructure stay in sync. If a resource is destroyed, the code is updated to match. The repo always represents the truth of what is deployed.
 
@@ -876,6 +955,8 @@ The SAA exam tests:
 | Issue | What It Means | How to Fix It |
 |-------|--------------|---------------|
 | `tofu` is not recognized | OpenTofu is not in your PATH | Close and reopen your terminal. On Windows, verify `C:\tofu\tofu.exe` exists. |
+| `No configuration files` / "no .tf files found" | Wrong folder, or files saved with the wrong extension | Run `pwd` — you must be in the `dev` folder. Check files are named exactly `main.tf` (not `main.tf.txt`). In VS Code the file tab shows the real name. |
+| Your file appears as `main.tf.txt` or `backend.tf.txt` | Notepad secretly added `.txt` | Recreate the file in VS Code (right-click the folder → New File → type the exact name). VS Code never adds hidden extensions. |
 | `Error configuring S3 Backend` | The state bucket name doesn't match | Open `backend.tf` and verify the bucket name matches exactly what you created in Step 4 |
 | `Cannot assume IAM Role` | Trust policy or credentials issue | Verify your AWS session is active (`aws sts get-caller-identity`). If expired, re-login with SSO. |
 | `Error acquiring the state lock` | A previous command was interrupted and left a stale lock | Run `tofu force-unlock <LOCK_ID>` using the lock ID shown in the error message |
