@@ -98,6 +98,8 @@ cd ~/Desktop/workshop-iac
 code .
 ```
 
+> **💡 Continuity from 7B:** Your helper script (`infra/scripts/tofu.ps1` or `tofu.sh`) is still there from Lab 7B, and on Windows the script-execution setting you applied in 7B still holds — so you can use the script right away in this lab.
+
 ---
 
 ## PART 1 — Build a Reusable Lambda Module
@@ -415,7 +417,7 @@ bash infra/scripts/tofu.sh dev init
 bash infra/scripts/tofu.sh dev plan
 ```
 
-> **💡 If you completed 7B, expect some `destroy` lines.** OpenTofu will remove your old `workshop-dev-hello` function (from 7B) and create the new module-based `workshop-dev-processor` plus the S3 resources. This is a normal refactor — you replaced the standalone function with a modular, event-driven one. The plan will show something like `Plan: 6 to add, 0 to change, 3 to destroy.`
+> **💡 If you completed 7B, expect both `add` and `destroy` lines — this is normal.** OpenTofu will remove your old standalone `workshop-dev-hello` function from 7B and create the new module-based `workshop-dev-processor` plus the S3 resources. You are *refactoring*: replacing the hand-written function with a modular, event-driven one. Don't worry about the exact counts — as long as the plan succeeds and lists the new `module.processor` resources and the S3 bucket/notification, you're on track.
 
 **Step 7b: Apply.** 📋 Copy and paste:
 
