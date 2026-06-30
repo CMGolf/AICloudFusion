@@ -269,7 +269,7 @@ aws s3 mb s3://workshop-tofu-state-<INITIALS> --region us-east-1
 
 **✅ You should see:** `make_bucket: workshop-tofu-state-<INITIALS>`
 
-> **💡 Why include the account ID?** S3 bucket names are globally unique. Including your account ID ensures no one else has the same name.
+> S3 bucket names are globally unique. You will receive an error if your bucket name already exists. Try adding country area code after initials if your initials are not unique enough eg: if246.
 
 **Enable versioning** (so you can recover previous state files if something goes wrong):
 
