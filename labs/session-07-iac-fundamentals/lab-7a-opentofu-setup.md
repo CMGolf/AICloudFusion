@@ -606,11 +606,11 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 
 resource "aws_s3_bucket" "test" {
-  bucket = "${var.project}-${var.environment}-test-${data.aws_caller_identity.current.account_id}"
+  bucket = "${var.project}-${var.environment}-test-<INITIALS>"
 }
 ```
 
-**Save the file as `main.tf`** in `infra/environments/dev/`.
+**Save the file as `main.tf`** in `infra/environments/dev/` and replace `<INITIALS>`.
 
 > **What does each section do?**
 >
