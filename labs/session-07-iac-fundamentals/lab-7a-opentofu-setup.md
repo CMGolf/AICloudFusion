@@ -363,7 +363,7 @@ The deploy role needs permission to manage the resources OpenTofu will create (S
 
 **Step 8a:** In VS Code's Explorer panel, **right-click the `workshop-iac` folder** → **New File** → name it exactly `tofu-permissions.json` → press Enter.
 
-📋 Copy and paste this into the file, **replacing `ACCOUNT_ID_HERE`** with your account ID:
+📋 Copy and paste this into the file, **replacing `<ACCOUNT_ID>`** with your account ID:
 
 ```json
 {
@@ -386,13 +386,13 @@ The deploy role needs permission to manage the resources OpenTofu will create (S
                 "dynamodb:PutItem",
                 "dynamodb:DeleteItem"
             ],
-            "Resource": "arn:aws:dynamodb:us-east-1:ACCOUNT_ID_HERE:table/terraform-locks"
+            "Resource": "arn:aws:dynamodb:us-east-1:<ACCOUNT_ID>:table/terraform-locks"
         }
     ]
 }
 ```
 
-**Replace `ACCOUNT_ID_HERE`** with your 12-digit account ID (1 place).
+**Replace `<ACCOUNT_ID>`** with your 12-digit account ID (1 place).
 
 **Save the file as `tofu-permissions.json`** in your `workshop-iac` folder.
 
@@ -487,12 +487,12 @@ You will now create five files in the `infra/environments/dev/` folder. These ar
 
 In VS Code's Explorer, expand `infra` → `environments`, then **right-click the `dev` folder** → **New File** → name it exactly `backend.tf` → press Enter.
 
-📋 Copy and paste this into the file, **replacing `ACCOUNT_ID_HERE`** with your account ID (1 place), then **save (Ctrl+S)**:
+📋 Copy and paste this into the file, **replacing `<INITIALS>`** with your account ID (1 place), then **save (Ctrl+S)**:
 
 ```hcl
 terraform {
   backend "s3" {
-    bucket         = "workshop-tofu-state-ACCOUNT_ID_HERE"
+    bucket         = "workshop-tofu-state-<INITIALS>"
     key            = "dev/terraform.tfstate"
     region         = "us-east-1"
     dynamodb_table = "terraform-locks"
@@ -551,13 +551,13 @@ variable "tofu_role_arn" {
 
 **Right-click the `dev` folder** → **New File** → name it exactly `terraform.tfvars` → press Enter.
 
-📋 Copy and paste this into the file, **replacing `ACCOUNT_ID_HERE`** with your account ID (1 place), then **save (Ctrl+S)**:
+📋 Copy and paste this into the file, **replacing `<INITIALS>`** with your account ID (1 place), then **save (Ctrl+S)**:
 
 ```hcl
 environment   = "dev"
 aws_region    = "us-east-1"
 project       = "workshop-iac"
-tofu_role_arn = "arn:aws:iam::ACCOUNT_ID_HERE:role/workshop-tofu-deploy-role"
+tofu_role_arn = "arn:aws:iam::<ACCOUNT_ID>:role/workshop-tofu-deploy-role"
 ```
 
 **Save the file as `terraform.tfvars`** in `infra/environments/dev/`.
