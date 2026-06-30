@@ -967,7 +967,7 @@ A "commit" is a saved snapshot of your project at a point in time.
 git status
 ```
 
-**✅ You should see** a list of files in green or under "Untracked files" — your `infra/` folder, the policy JSON files, and `.gitignore`. 
+**✅ You should see** a list of files in red or under "Untracked files" — your `infra/` folder, the policy JSON files, and `.gitignore`. 
 
 > **💡 Notice what is NOT listed:** the `.terraform/` folder and any `.tfstate` files. Your `.gitignore` is doing its job — those are deliberately excluded because state lives safely in S3, not in Git.
 
