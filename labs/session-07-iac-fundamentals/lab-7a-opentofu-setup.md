@@ -551,7 +551,7 @@ variable "tofu_role_arn" {
 
 **Right-click the `dev` folder** → **New File** → name it exactly `terraform.tfvars` → press Enter.
 
-📋 Copy and paste this into the file, **replacing `<INITIALS>`** with your account ID (1 place), then **save (Ctrl+S)**:
+📋 Copy and paste this into the file, **replacing `<ACCOUNT_ID>`** with your account ID (1 place), then **save (Ctrl+S)**:
 
 ```hcl
 environment   = "dev"
