@@ -75,7 +75,7 @@ Commands are inside gray code boxes. **📋 Copy and paste** them into your term
 | Placeholder | What to Replace It With | Example |
 |-------------|------------------------|---------|
 | `<YOUR_PROFILE_NAME>` | Your AWS CLI profile name from Lab 1A | `AdministratorAccess-123456789012` |
-| `<YOUR_ACCOUNT_ID>` | Your 12-digit AWS account number | `123456789012` |
+| `<ACCOUNT_ID>` | Your 12-digit AWS account number | `123456789012` |
 | `<INITIALS>` | Your first and last name initials | `if` |
 
 ---
@@ -322,7 +322,7 @@ Instead of running OpenTofu with your full admin credentials, you will create a 
 
 In VS Code's Explorer panel, **right-click the `workshop-iac` folder** (the top-level one) → **New File** → name it exactly `tofu-trust-policy.json` → press Enter.
 
-📋 Copy and paste this into the file, **replacing `ACCOUNT_ID_HERE`** with your 12-digit account ID (the one you wrote down in Step 1):
+📋 Copy and paste this into the file, **replacing `<ACCOUNT_ID>`** with your 12-digit account ID (the one you wrote down in Step 1):
 
 ```json
 {
@@ -331,7 +331,7 @@ In VS Code's Explorer panel, **right-click the `workshop-iac` folder** (the top-
         {
             "Effect": "Allow",
             "Principal": {
-                "AWS": "arn:aws:iam::ACCOUNT_ID_HERE:root"
+                "AWS": "arn:aws:iam::<ACCOUNT_ID>:root"
             },
             "Action": "sts:AssumeRole"
         }
@@ -339,7 +339,7 @@ In VS Code's Explorer panel, **right-click the `workshop-iac` folder** (the top-
 }
 ```
 
-**Replace `ACCOUNT_ID_HERE` in 1 place**, then **save the file (Ctrl+S / Cmd+S)**.
+**Replace `<ACCOUNT_ID>` in 1 place**, then **save the file (Ctrl+S / Cmd+S)**.
 
 > **⚠️ Double-check:** The file name is `tofu-trust-policy.json` — not `.json.txt`. In VS Code, look at the file tab at the top; it should say `tofu-trust-policy.json`.
 
