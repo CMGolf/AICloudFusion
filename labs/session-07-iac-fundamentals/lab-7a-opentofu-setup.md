@@ -1088,28 +1088,28 @@ The SAA exam tests:
 
 **Step 1: Delete the state bucket**
 
-📋 Copy and paste, **replacing `<YOUR_ACCOUNT_ID>`**:
+📋 Copy and paste, **replacing `<INITIALS>`**:
 
 **Windows (PowerShell):**
 ```powershell
-aws s3 rm s3://workshop-tofu-state-<YOUR_ACCOUNT_ID> --recursive
+aws s3 rm s3://workshop-tofu-state-<INITIALS> --recursive
 ```
 
 Then delete all versions (the bucket has versioning enabled):
 
 ```powershell
-$versions = aws s3api list-object-versions --bucket workshop-tofu-state-<YOUR_ACCOUNT_ID> --output json | ConvertFrom-Json
-foreach ($v in $versions.Versions) { aws s3api delete-object --bucket workshop-tofu-state-<YOUR_ACCOUNT_ID> --key $v.Key --version-id $v.VersionId | Out-Null }
-foreach ($m in $versions.DeleteMarkers) { aws s3api delete-object --bucket workshop-tofu-state-<YOUR_ACCOUNT_ID> --key $m.Key --version-id $m.VersionId | Out-Null }
-aws s3 rb s3://workshop-tofu-state-<YOUR_ACCOUNT_ID>
+$versions = aws s3api list-object-versions --bucket workshop-tofu-state-<INITIALS> --output json | ConvertFrom-Json
+foreach ($v in $versions.Versions) { aws s3api delete-object --bucket workshop-tofu-state-<INITIALS> --key $v.Key --version-id $v.VersionId | Out-Null }
+foreach ($m in $versions.DeleteMarkers) { aws s3api delete-object --bucket workshop-tofu-state-<INITIALS> --key $m.Key --version-id $m.VersionId | Out-Null }
+aws s3 rb s3://workshop-tofu-state-<INITIALS>
 ```
 
 **macOS / Linux:**
 ```bash
-aws s3 rm s3://workshop-tofu-state-<YOUR_ACCOUNT_ID> --recursive
-aws s3api delete-objects --bucket workshop-tofu-state-<YOUR_ACCOUNT_ID> --delete "$(aws s3api list-object-versions --bucket workshop-tofu-state-<YOUR_ACCOUNT_ID> --query '{Objects: Versions[].{Key:Key,VersionId:VersionId}}' --output json)"
-aws s3api delete-objects --bucket workshop-tofu-state-<YOUR_ACCOUNT_ID> --delete "$(aws s3api list-object-versions --bucket workshop-tofu-state-<YOUR_ACCOUNT_ID> --query '{Objects: DeleteMarkers[].{Key:Key,VersionId:VersionId}}' --output json)"
-aws s3 rb s3://workshop-tofu-state-<YOUR_ACCOUNT_ID>
+aws s3 rm s3://workshop-tofu-state-<INITIALS> --recursive
+aws s3api delete-objects --bucket workshop-tofu-state-<INITIALS> --delete "$(aws s3api list-object-versions --bucket workshop-tofu-state-<INITIALS> --query '{Objects: Versions[].{Key:Key,VersionId:VersionId}}' --output json)"
+aws s3api delete-objects --bucket workshop-tofu-state-<INITIALS> --delete "$(aws s3api list-object-versions --bucket workshop-tofu-state-<INITIALS> --query '{Objects: DeleteMarkers[].{Key:Key,VersionId:VersionId}}' --output json)"
+aws s3 rb s3://workshop-tofu-state-<INITIALS>
 ```
 
 **Step 2: Delete the DynamoDB lock table**
