@@ -543,7 +543,7 @@ cat response.json
 
 1. Go to [https://console.aws.amazon.com/](https://console.aws.amazon.com/) → search **Lambda**
 2. Click **workshop-dev-hello**
-3. Notice the **Tags** (Environment, Project, ManagedBy=opentofu) — applied automatically
+3. Select **Configuration**. Notice the **Tags** (Environment, Project, ManagedBy=opentofu) — applied automatically
 4. Scroll to **Configuration → Monitoring** or check **CloudWatch logs** — the `/aws/lambda/workshop-dev-hello` log group exists with 7-day retention
 
 > **🎉 You deployed a complete Lambda stack — function, role, and logging — from code, with one command.** Compare this to Lab 6B where you ran six separate CLI commands and had to wait between them.
