@@ -76,6 +76,7 @@ Commands are inside gray code boxes. **📋 Copy and paste** them into your term
 |-------------|------------------------|---------|
 | `<YOUR_PROFILE_NAME>` | Your AWS CLI profile name from Lab 1A | `AdministratorAccess-123456789012` |
 | `<YOUR_ACCOUNT_ID>` | Your 12-digit AWS account number | `123456789012` |
+| `<INITIALS>` | Your first and last name initials | `if` |
 
 ---
 
@@ -153,27 +154,15 @@ OpenTofu is a single executable file — no installer needed. You download it, p
 📋 Copy and paste these commands one at a time:
 
 ```powershell
-Invoke-WebRequest -Uri "https://github.com/opentofu/opentofu/releases/download/v1.9.1/tofu_1.9.1_windows_amd64.zip" -OutFile "$env:TEMP\tofu.zip"
+Invoke-WebRequest -Uri "https://github.com/opentofu/opentofu/releases/latest/download/tofu_windows_amd64.zip" -OutFile "tofu.zip"
 ```
 
 ```powershell
-Expand-Archive -Path "$env:TEMP\tofu.zip" -DestinationPath "$env:TEMP\tofu" -Force
+Expand-Archive -Path "tofu.zip" -DestinationPath "C:\OpenTofu"
 ```
 
 ```powershell
-New-Item -ItemType Directory -Path "C:\tofu" -Force
-```
-
-```powershell
-Copy-Item "$env:TEMP\tofu\tofu.exe" "C:\tofu\tofu.exe" -Force
-```
-
-```powershell
-[Environment]::SetEnvironmentVariable("PATH", [Environment]::GetEnvironmentVariable("PATH", "User") + ";C:\tofu", "User")
-```
-
-```powershell
-$env:PATH += ";C:\tofu"
+$env:Path += ";C:\OpenTofu"
 ```
 
 > **What do these commands do?**
@@ -266,34 +255,34 @@ Before OpenTofu can manage infrastructure, it needs a place to store its state f
 
 ### Step 4: Create the State Bucket
 
-📋 Copy and paste, **replacing `<YOUR_ACCOUNT_ID>`**:
+📋 Copy and paste, **replacing `<INITIALS>`**:
 
 **Windows (PowerShell):**
 ```powershell
-aws s3 mb s3://workshop-tofu-state-<YOUR_ACCOUNT_ID> --region us-east-1
+aws s3 mb s3://workshop-tofu-state-<INITIALS> --region us-east-1
 ```
 
 **macOS / Linux:**
 ```bash
-aws s3 mb s3://workshop-tofu-state-<YOUR_ACCOUNT_ID> --region us-east-1
+aws s3 mb s3://workshop-tofu-state-<INITIALS> --region us-east-1
 ```
 
-**✅ You should see:** `make_bucket: workshop-tofu-state-<YOUR_ACCOUNT_ID>`
+**✅ You should see:** `make_bucket: workshop-tofu-state-<INITIALS>`
 
 > **💡 Why include the account ID?** S3 bucket names are globally unique. Including your account ID ensures no one else has the same name.
 
 **Enable versioning** (so you can recover previous state files if something goes wrong):
 
-📋 Copy and paste, **replacing `<YOUR_ACCOUNT_ID>`**:
+📋 Copy and paste, **replacing `<INITIALS>`**:
 
 **Windows (PowerShell):**
 ```powershell
-aws s3api put-bucket-versioning --bucket workshop-tofu-state-<YOUR_ACCOUNT_ID> --versioning-configuration Status=Enabled
+aws s3api put-bucket-versioning --bucket workshop-tofu-state-<INITIALS> --versioning-configuration Status=Enabled
 ```
 
 **macOS / Linux:**
 ```bash
-aws s3api put-bucket-versioning --bucket workshop-tofu-state-<YOUR_ACCOUNT_ID> --versioning-configuration Status=Enabled
+aws s3api put-bucket-versioning --bucket workshop-tofu-state-<INITIALS> --versioning-configuration Status=Enabled
 ```
 
 **✅ No output means success.**
