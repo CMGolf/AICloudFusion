@@ -38,7 +38,7 @@ In this lab, you will set up a **complete Infrastructure as Code (IaC) environme
 
 | Service | What It Is | Cost |
 |---------|-----------|------|
-| Amazon S3 | State file storage | Free within 5 GB (12-month free tier) |
+| Amazon S3 | State file storage | 0.023 per GB/Month |
 | Amazon DynamoDB | State lock table | Free within 25 GB + 25 WCU/25 RCU (Always Free) |
 | AWS IAM | Role for OpenTofu | Always Free |
 
