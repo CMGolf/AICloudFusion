@@ -123,7 +123,7 @@ In Lab 7A, your deploy role could only manage S3 and the lock table — that's a
 
 > **💡 Why not just give it full admin from the start?** Least privilege. You grant permissions as the need arises, so the role can never do more than the job requires. Expanding it now is exactly what you'd do on a real team when a project grows.
 
-**Step 2a:** In VS Code, open the `tofu-permissions.json` file (in the top-level `workshop-iac` folder) you created in Lab 7A. Select everything (**Ctrl+A**) and delete it, then 📋 paste this expanded version, **replacing `ACCOUNT_ID_HERE` in 4 places**:
+**Step 2a:** In VS Code, open the `tofu-permissions.json` file (in the top-level `workshop-iac` folder) you created in Lab 7A. Select everything (**Ctrl+A**) and delete it, then 📋 paste this expanded version, **replacing `<YOUR_ACCOUNT_ID>` in 4 places**:
 
 ```json
 {
@@ -146,13 +146,13 @@ In Lab 7A, your deploy role could only manage S3 and the lock table — that's a
                 "dynamodb:PutItem",
                 "dynamodb:DeleteItem"
             ],
-            "Resource": "arn:aws:dynamodb:us-east-1:ACCOUNT_ID_HERE:table/terraform-locks"
+            "Resource": "arn:aws:dynamodb:us-east-1:<YOUR_ACCOUNT_ID>:table/terraform-locks"
         },
         {
             "Sid": "LambdaManage",
             "Effect": "Allow",
             "Action": "lambda:*",
-            "Resource": "arn:aws:lambda:us-east-1:ACCOUNT_ID_HERE:function:workshop-*"
+            "Resource": "arn:aws:lambda:us-east-1:<YOUR_ACCOUNT_ID>:function:workshop-*"
         },
         {
             "Sid": "IAMManageLambdaRoles",
@@ -171,13 +171,13 @@ In Lab 7A, your deploy role could only manage S3 and the lock table — that's a
                 "iam:GetRolePolicy",
                 "iam:DeleteRolePolicy"
             ],
-            "Resource": "arn:aws:iam::ACCOUNT_ID_HERE:role/workshop-*"
+            "Resource": "arn:aws:iam::<YOUR_ACCOUNT_ID>:role/workshop-*"
         },
         {
             "Sid": "LogsManage",
             "Effect": "Allow",
             "Action": "logs:*",
-            "Resource": "arn:aws:logs:us-east-1:ACCOUNT_ID_HERE:*"
+            "Resource": "arn:aws:logs:us-east-1:<YOUR_ACCOUNT_ID>:*"
         }
     ]
 }
@@ -185,7 +185,7 @@ In Lab 7A, your deploy role could only manage S3 and the lock table — that's a
 
 **Save the file (Ctrl+S).**
 
-> **⚠️ Replace `ACCOUNT_ID_HERE` in 4 places** (the DynamoDB, Lambda, IAM, and Logs ARNs). Your account ID is the 12-digit number from `aws sts get-caller-identity`.
+> **⚠️ Replace `<YOUR_ACCOUNT_ID>` in 4 places** (the DynamoDB, Lambda, IAM, and Logs ARNs). Your account ID is the 12-digit number from `aws sts get-caller-identity`.
 
 > **What did you add?**
 > - `LambdaManage` — create and manage Lambda functions named `workshop-*`
