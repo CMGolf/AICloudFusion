@@ -154,8 +154,11 @@ OpenTofu is a single executable file — no installer needed. You download it, p
 📋 Copy and paste these commands one at a time:
 
 ```powershell
-Invoke-WebRequest -Uri "https://github.com/opentofu/opentofu/releases/latest/download/tofu_windows_amd64.zip" -OutFile "tofu.zip"
+Invoke-WebRequest -Uri "https://github.com/opentofu/opentofu/releases/download/v1.12.3/tofu_1.12.3_windows_amd64.zip" -OutFile "tofu.zip"
 ```
+>[!NOTE]
+>This is the latest version of OpenTofu as of June, 2026. Double check and adjust the command to the latest for your usage.
+
 
 ```powershell
 Expand-Archive -Path "tofu.zip" -DestinationPath "C:\OpenTofu"
@@ -184,7 +187,7 @@ brew install opentofu
 **macOS / Linux (manual download):**
 
 ```bash
-curl -Lo /tmp/tofu.zip "https://github.com/opentofu/opentofu/releases/download/v1.9.1/tofu_1.9.1_$(uname -s | tr '[:upper:]' '[:lower:]')_amd64.zip"
+curl -Lo /tmp/tofu.zip "https://github.com/opentofu/opentofu/releases/download/v1.9.1/tofu_1.12.3_$(uname -s | tr '[:upper:]' '[:lower:]')_amd64.zip"
 sudo unzip -o /tmp/tofu.zip -d /usr/local/bin/ tofu
 ```
 
