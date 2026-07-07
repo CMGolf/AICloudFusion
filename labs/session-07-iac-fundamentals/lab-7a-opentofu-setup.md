@@ -204,7 +204,7 @@ tofu --version
 **✅ You should see:**
 
 ```
-OpenTofu v1.9.1
+OpenTofu v1.12.3
 on windows_amd64
 ```
 
@@ -221,8 +221,7 @@ on windows_amd64
 📋 Copy and paste:
 
 ```powershell
-mkdir ~\Desktop\workshop-iac
-cd ~\Desktop\workshop-iac
+mkdir ~\Desktop\workshop-iac; cd ~\Desktop\workshop-iac
 ```
 
 **macOS / Linux:**
@@ -312,6 +311,13 @@ aws dynamodb describe-table --table-name terraform-locks --query "Table.TableSta
 
 > **What is this table for?** When you run `tofu apply`, OpenTofu writes a lock entry to this table. If someone else (or you in another terminal) tries to run `tofu apply` at the same time, they see the lock and wait. This prevents two people from changing the same infrastructure simultaneously.
 
+>[!TIP]
+>You can also use the command below to see if you have any other DynamoDB tables active:
+
+```
+aws dynamodb list-tables
+```
+
 ---
 
 ## PART 2 — Create the OpenTofu Deploy Role
@@ -344,7 +350,8 @@ In VS Code's Explorer panel, **right-click the `workshop-iac` folder** (the top-
 
 **Replace `<ACCOUNT_ID>` in 1 place**, then **save the file (Ctrl+S / Cmd+S)**.
 
-> **⚠️ Double-check:** The file name is `tofu-trust-policy.json` — not `.json.txt`. In VS Code, look at the file tab at the top; it should say `tofu-trust-policy.json`.
+>[!Warning]
+> **Double-check:** The file name is `tofu-trust-policy.json` — not `.json.txt`. In VS Code, look at the file tab at the top; it should say `tofu-trust-policy.json`.
 
 > **What does this file do?** It says "any identity in my AWS account can assume this role." Since you are the only person in your account, this effectively means "I can assume this role." In a team environment, you would restrict this further to specific users or CI/CD roles.
 
@@ -488,6 +495,12 @@ You will now create five files in the `infra/environments/dev/` folder. These ar
 
 **Step 10a: Create `backend.tf`** — tells OpenTofu where to store its state
 
+>[!Note]
+> * **Remote state storage:** Defines where Terraform/Tofu keeps the state file (instead of locally on disk).
+> * **State locking:** Prevents multiple users from applying changes at the same time (avoid race conditions). 
+> * **Consistency:** Ensures every team member works against the same state snapshot. 
+> * **Security:** Keeps state in a amanaged service (like DynamoDB + S3), rather than on local device. 
+
 In VS Code's Explorer, expand `infra` → `environments`, then **right-click the `dev` folder** → **New File** → name it exactly `backend.tf` → press Enter.
 
 📋 Copy and paste this into the file, **replacing `<INITIALS>`** with your account ID (1 place), then **save (Ctrl+S)**:
@@ -546,7 +559,9 @@ variable "tofu_role_arn" {
 
 **Save the file as `variables.tf`** in `infra/environments/dev/`.
 
-> **What does this file do?** It declares the inputs (variables) that this configuration needs. Think of it like function parameters — you define what inputs are expected, and the actual values go in a separate file (`terraform.tfvars`).
+>[!NOTE]
+>**What does this file do?** It declares the inputs (variables) that this configuration needs. Think of it like function parameters — you define what inputs
+>are expected, and the actual values go in a separate file (`terraform.tfvars`).
 
 ---
 
@@ -565,7 +580,9 @@ tofu_role_arn = "arn:aws:iam::<ACCOUNT_ID>:role/workshop-tofu-deploy-role"
 
 **Save the file as `terraform.tfvars`** in `infra/environments/dev/`.
 
-> **What does this file do?** It provides the actual values for each variable. OpenTofu automatically reads this file when you run commands. Notice `tofu_role_arn` points to the role you created in Step 7 — this is how OpenTofu knows which role to assume.
+>[!NOTE]
+>**What does this file do?** It provides the actual values for each variable. OpenTofu automatically reads this file when you run commands. Notice
+>`tofu_role_arn` points to the role you created in Step 7 — this is how OpenTofu knows which role to assume.
 
 ---
 
@@ -750,7 +767,8 @@ OpenTofu has been successfully initialized!
 > - The state lock table is ready
 > - You can now run `plan` and `apply`
 
-> **💡 If you get an error** about "Error configuring S3 Backend": double-check the bucket name in `backend.tf` matches the bucket you created in Step 4 (including your account ID).
+>[!WARNING]
+> **💡 If you get an error** about "Error configuring S3 Backend": double-check the bucket name in `backend.tf` matches the bucket you created in Step 4.
 
 ---
 
@@ -772,7 +790,7 @@ OpenTofu will perform the following actions:
 
   # aws_s3_bucket.test will be created
   + resource "aws_s3_bucket" "test" {
-      + bucket    = "workshop-iac-dev-test-123456789012"
+      + bucket    = "workshop-iac-dev-test-<INITIALS>"
       + tags_all  = {
           + "Environment" = "dev"
           + "ManagedBy"   = "opentofu"
@@ -816,17 +834,23 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 Outputs:
 
-test_bucket_name = "workshop-iac-dev-test-123456789012"
-test_bucket_arn = "arn:aws:s3:::workshop-iac-dev-test-123456789012"
+test_bucket_name = "workshop-iac-dev-test-<INITIALS>"
+test_bucket_arn = (known after apply)
 ```
 
 > **🎉 You just created real AWS infrastructure from a text file!** The bucket exists, it has the correct tags, and OpenTofu's state file in S3 records that it was created.
+
+>[!TIP]
+>You can verify within the CLI that the S3 was created utilizing the following command:
+```
+aws s3 ls
+```
 
 **✅ Console Checkpoint:**
 
 1. Go to [https://console.aws.amazon.com/](https://console.aws.amazon.com/)
 2. Search for **S3** and click it
-3. Find `workshop-iac-dev-test-<YOUR_ACCOUNT_ID>` in the list
+3. Find `workshop-iac-dev-test-<INITIALS>` in the list
 4. Click on it → **Properties** tab → scroll to **Tags**
 5. You should see: `Environment=dev`, `Project=workshop-iac`, `ManagedBy=opentofu`
 
@@ -862,6 +886,12 @@ Destroy complete! Resources: 1 destroyed.
 > 4. Updated the state file (bucket no longer tracked)
 >
 > Go back to the S3 console and refresh — the test bucket is gone. **One command cleaned up everything.** Compare this to the manual cleanup steps in Labs 6A, 6B, and 6C — no more deleting versions, detaching policies, or forgetting a resource.
+
+>[!TIP]
+>You can verify within the CLI that the S3 was deleted utilizing the following command:
+```
+aws s3 ls
+```
 
 ---
 
@@ -941,6 +971,9 @@ git init
 **✅ You should see:** `Initialized empty Git repository in .../workshop-iac/.git/`
 
 > **What does this do?** It creates a hidden `.git` folder that tracks every change to your project. Your folder is now a Git repository.
+
+>[!NOTE]
+>Green dot next to a file means new whereas the letter `U` means untracked.
 
 **Step 17c: Tell Git who you are** (only needed once per computer). 📋 Copy and paste, **replacing the name and email with your own**:
 
@@ -1080,7 +1113,7 @@ The SAA exam tests:
 
 **No cleanup needed.** Keep everything in place:
 - ✅ **Your local project folder / Git repo stays** (`~/Desktop/workshop-iac`) — this is your code; do not delete it
-- ✅ State bucket stays (`workshop-tofu-state-<YOUR_ACCOUNT_ID>`)
+- ✅ State bucket stays (`workshop-tofu-state-<INITIALS>`)
 - ✅ Lock table stays (`terraform-locks`)
 - ✅ Deploy role stays (`workshop-tofu-deploy-role`)
 - The test S3 bucket was already destroyed in Step 15
@@ -1101,10 +1134,7 @@ aws s3 rm s3://workshop-tofu-state-<INITIALS> --recursive
 Then delete all versions (the bucket has versioning enabled):
 
 ```powershell
-$versions = aws s3api list-object-versions --bucket workshop-tofu-state-<INITIALS> --output json | ConvertFrom-Json
-foreach ($v in $versions.Versions) { aws s3api delete-object --bucket workshop-tofu-state-<INITIALS> --key $v.Key --version-id $v.VersionId | Out-Null }
-foreach ($m in $versions.DeleteMarkers) { aws s3api delete-object --bucket workshop-tofu-state-<INITIALS> --key $m.Key --version-id $m.VersionId | Out-Null }
-aws s3 rb s3://workshop-tofu-state-<INITIALS>
+$versions = aws s3api list-object-versions --bucket workshop-tofu-state-<INITIALS> --output json | ConvertFrom-Json; foreach ($v in $versions.Versions) { aws s3api delete-object --bucket workshop-tofu-state-<INITIALS> --key $v.Key --version-id $v.VersionId | Out-Null }; foreach ($m in $versions.DeleteMarkers) { aws s3api delete-object --bucket workshop-tofu-state-<INITIALS> --key $m.Key --version-id $m.VersionId | Out-Null }; aws s3 rb s3://workshop-tofu-state-<INITIALS>
 ```
 
 **macOS / Linux:**
