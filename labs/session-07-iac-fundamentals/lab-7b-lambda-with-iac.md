@@ -41,7 +41,7 @@ By the end of this lab, you will have:
 | Service | What It Is | Cost |
 |---------|-----------|------|
 | AWS Lambda | Serverless compute | Always Free: 1M requests + 400,000 GB-seconds/month |
-| Amazon CloudWatch Logs | Function logs | Free within 5 GB ingest/storage per month |
+| Amazon CloudWatch Logs | Function logs | 	~$0.00 ($0.50 per GB — this lab generates kilobytes) |
 | AWS IAM | Lambda execution role | Always Free |
 
 **Estimated cost for this lab: $0.00**
@@ -521,9 +521,7 @@ Now invoke it. 📋 Copy and paste (run from the `dev` folder so it finds the fi
 
 **Windows (PowerShell):**
 ```powershell
-cd ~\Desktop\workshop-iac\infra\environments\dev
-aws lambda invoke --function-name workshop-dev-hello --payload file://invoke.json --cli-binary-format raw-in-base64-out --region us-east-1 response.json
-Get-Content response.json
+cd ~\Desktop\workshop-iac\infra\environments\dev; aws lambda invoke --function-name workshop-dev-hello --payload file://invoke.json --cli-binary-format raw-in-base64-out --region us-east-1 response.json; Get-Content response.json
 ```
 
 **macOS / Linux:**
