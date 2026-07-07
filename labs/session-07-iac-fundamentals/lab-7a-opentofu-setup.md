@@ -39,10 +39,10 @@ In this lab, you will set up a **complete Infrastructure as Code (IaC) environme
 | Service | What It Is | Cost |
 |---------|-----------|------|
 | Amazon S3 | State file storage | 0.023 per GB/Month |
-| Amazon DynamoDB | State lock table | Free within 25 GB + 25 WCU/25 RCU (Always Free) |
+| Amazon DynamoDB | State lock table | 0.25 per GB/Month + 100k Write/Reads at ~ 0.08 |
 | AWS IAM | Role for OpenTofu | Always Free |
 
-**Estimated cost for this lab: $0.00**
+**Estimated cost for this lab: $0.10**
 
 > **⚠️ Note:** The state backend (S3 bucket + DynamoDB table) and the IAM role you create in this lab are **kept after the lab ends** — they are the foundation for Labs 7B and 7C. Only the "test" S3 bucket deployed in the final step is destroyed.
 
