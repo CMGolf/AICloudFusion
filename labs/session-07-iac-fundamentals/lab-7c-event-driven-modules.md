@@ -39,7 +39,7 @@ By the end you will have a complete, wired system defined entirely in code, and 
 | Service | What It Is | Cost |
 |---------|-----------|------|
 | AWS Lambda | Serverless compute | Always Free: 1M requests/month |
-| Amazon S3 | Upload bucket | Free within 5 GB / 2,000 PUT (12-month free tier) |
+| Amazon S3 | Upload bucket | 0.02 per GB/Month |
 | Amazon CloudWatch Logs | Function logs | Free within 5 GB/month |
 | AWS IAM | Lambda execution role | Always Free |
 
@@ -71,18 +71,35 @@ Files are created in **VS Code** (right-click the correct folder → New File �
 |-------------|------------------------|---------|
 | `<YOUR_PROFILE_NAME>` | Your AWS CLI profile name | `AdministratorAccess-123456789012` |
 | `<YOUR_ACCOUNT_ID>` | Your 12-digit AWS account number | `123456789012` |
+| `<INITIALS>` | Your first and last name initials | `if` |
 
 ---
 
-## Lab Steps
+### Step 1: Set Your AWS Profile and Reopen Your Project
 
-### Step 1: Set Your Profile and Reopen Your Project
+Before running any AWS commands, set your default profile so you do not have to type it on every command.
 
-**Step 1a:** Set your AWS profile (Windows: `$env:AWS_PROFILE="<YOUR_PROFILE_NAME>"`, Mac/Linux: `export AWS_PROFILE="<YOUR_PROFILE_NAME>"`), then verify:
+**Windows (PowerShell):**
+
+📋 Copy and paste this command, **replacing `<YOUR_PROFILE_NAME>`** with your actual profile name from Lab 1A:
+
+```powershell
+$env:AWS_PROFILE="<YOUR_PROFILE_NAME>"
+```
+
+**macOS / Linux:**
+
+```bash
+export AWS_PROFILE="<YOUR_PROFILE_NAME>"
+```
+
+**Verify it works.** 📋 Copy and paste this and press Enter:
 
 ```
 aws sts get-caller-identity
 ```
+
+**✅ You should see** your account ID and role. If you get an error about an expired token, run `aws sso login --profile <YOUR_PROFILE_NAME>` first, then set the profile again.
 
 **Step 1b:** Open your project and keep your terminal there:
 
@@ -274,6 +291,9 @@ def lambda_handler(event, context):
 
 Open `infra/environments/dev/main.tf`, select all (**Ctrl+A**), delete, and 📋 paste this complete version, then save:
 
+>[!WARNING]
+>Be sure to change the <INITIALS> placeholder in the code.
+
 ```hcl
 terraform {
   required_version = ">= 1.6.0"
@@ -324,7 +344,7 @@ module "processor" {
 # S3 bucket that triggers the Lambda on upload
 # ------------------------------------------------------------
 resource "aws_s3_bucket" "uploads" {
-  bucket        = "workshop-${var.environment}-uploads-${data.aws_caller_identity.current.account_id}"
+  bucket        = "workshop-${var.environment}-uploads-<INITIALS>"
   force_destroy = true
 }
 
@@ -385,6 +405,12 @@ output "uploads_bucket" {
 
 ### Step 6: Re-Initialize (You Added a Module)
 
+If you are starting from a fresh CLI, set the path for Tofu again as shown in 7A:
+
+```
+$env:Path += ";C:\OpenTofu"
+```
+
 Whenever you add a module, you must run `tofu init` again so OpenTofu loads it. 📋 From the project root:
 
 **Windows (PowerShell):**
@@ -443,18 +469,16 @@ Type `yes` when prompted.
 
 This is the moment everything has been building toward.
 
-**Step 8a: Create a test file and upload it.** 📋 Copy and paste, **replacing `<YOUR_ACCOUNT_ID>`**:
+**Step 8a: Create a test file and upload it.** 📋 Copy and paste, **replacing `<INITIALS>`**:
 
 **Windows (PowerShell):**
 ```powershell
-"This file should trigger my Lambda." | Set-Content -Path "$env:TEMP\test-upload.txt"
-aws s3 cp "$env:TEMP\test-upload.txt" s3://workshop-dev-uploads-<YOUR_ACCOUNT_ID>/test-upload.txt
+"This file should trigger my Lambda." | Set-Content -Path "$env:TEMP\test-upload.txt"; aws s3 cp "$env:TEMP\test-upload.txt" s3://workshop-dev-uploads-<INITIALS>/test-upload.txt
 ```
 
 **macOS / Linux:**
 ```bash
-echo "This file should trigger my Lambda." > /tmp/test-upload.txt
-aws s3 cp /tmp/test-upload.txt s3://workshop-dev-uploads-<YOUR_ACCOUNT_ID>/test-upload.txt
+echo "This file should trigger my Lambda." > /tmp/test-upload.txt; aws s3 cp /tmp/test-upload.txt s3://workshop-dev-uploads-<INITIALS>/test-upload.txt
 ```
 
 **✅ You should see** an `upload:` confirmation.
@@ -464,19 +488,23 @@ aws s3 cp /tmp/test-upload.txt s3://workshop-dev-uploads-<YOUR_ACCOUNT_ID>/test-
 **Windows (PowerShell):**
 ```powershell
 $stream = aws logs describe-log-streams --log-group-name "/aws/lambda/workshop-dev-processor" --order-by LastEventTime --descending --max-items 1 --query "logStreams[0].logStreamName" --output text --region us-east-1
+```
+
+```
 aws logs get-log-events --log-group-name "/aws/lambda/workshop-dev-processor" --log-stream-name $stream --query "events[].message" --output text --region us-east-1
 ```
 
 **macOS / Linux:**
 ```bash
 STREAM=$(aws logs describe-log-streams --log-group-name "/aws/lambda/workshop-dev-processor" --order-by LastEventTime --descending --max-items 1 --query "logStreams[0].logStreamName" --output text --region us-east-1)
+
 aws logs get-log-events --log-group-name "/aws/lambda/workshop-dev-processor" --log-stream-name "$STREAM" --query "events[].message" --output text --region us-east-1
 ```
 
 **✅ You should see** a log line like:
 
 ```
-New file uploaded to S3: bucket=workshop-dev-uploads-123456789012, key=test-upload.txt
+New file uploaded to S3: bucket=workshop-dev-uploads-<INITIALS>, key=test-upload.txt
 ```
 
 > **🎉 Your Lambda fired automatically!** You never invoked it — uploading the file did. That is event-driven architecture: a file lands in S3, S3 notifies Lambda, your code runs. And you built the entire wiring in code.
@@ -485,7 +513,7 @@ New file uploaded to S3: bucket=workshop-dev-uploads-123456789012, key=test-uplo
 
 1. AWS Console → **Lambda** → **workshop-dev-processor** → **Monitor** tab → you should see an invocation spike
 2. AWS Console → **S3** → your uploads bucket → your file is there
-3. The function's role is named `workshop-dev-processor-role` — created by your **module**, not hand-written
+3. AWS Console → **IAM** → **Access Management** → **Roles** tab → you should see the function's role is named `workshop-dev-processor-role` — created by your **module**, not hand-written
 
 ---
 
